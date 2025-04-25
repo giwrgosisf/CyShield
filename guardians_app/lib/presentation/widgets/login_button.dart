@@ -5,14 +5,11 @@ import '../../../bloc/login/login_bloc.dart';
 import '../../../bloc/login/login_event.dart';
 import '../../../bloc/login/login_state.dart';
 
-
-
 class LoginButton extends StatelessWidget {
   const LoginButton({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final primary = Theme.of(context).primaryColor;
     return BlocConsumer<LoginBloc, LoginState>(
       listenWhen:
           (prev, curr) =>
@@ -24,8 +21,7 @@ class LoginButton extends StatelessWidget {
             SnackBar(content: Text(state.errorMessage ?? 'Error')),
           );
         } else if (state.status == LoginStatus.success) {
-          Navigator.pushNamed(context, '/ReportsScreen');
-
+          Navigator.of(ctx).pushReplacementNamed('/temp');
         }
       },
       buildWhen: (prev, curr) => prev.status != curr.status,
@@ -35,19 +31,14 @@ class LoginButton extends StatelessWidget {
           height: 48,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-<<<<<<< Updated upstream
-              backgroundColor: AppTheme.secondary,
-              foregroundColor: Colors.white
-=======
-                backgroundColor: Color(0xFF5FA6F9),
+                backgroundColor: AppTheme.thirdBlue,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
->>>>>>> Stashed changes
             ),
             onPressed:
                 state.status == LoginStatus.submitting
-                    ? null
+                    ? null    // disabled
                     : () => ctx.read<LoginBloc>().add(LoginWithEmailPressed()),
             child:
                 state.status == LoginStatus.submitting

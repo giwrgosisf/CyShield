@@ -64,7 +64,9 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/cyshield_logo.png"
+  image_path: "assets/shortcut_icon.png"
+  adaptive_icon_foreground: "assets/shortcut_icon.png"
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

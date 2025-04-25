@@ -18,7 +18,6 @@ class CyShieldGuardiansApp extends StatelessWidget {
   const CyShieldGuardiansApp({super.key});
 
   @override
-  @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
@@ -29,23 +28,8 @@ class CyShieldGuardiansApp extends StatelessWidget {
         title: 'CyShieldGuardians',
         theme: ThemeData(primarySwatch: Colors.blue),
         routes: {
-<<<<<<< Updated upstream
-          '/': (_) => LoginPage(),
-
-          '/ReportsScreen': (context) =>
-              Builder(
-                builder: (context) {
-                  return BlocProvider(
-                    create: (_) =>
-                        ReportsBloc(context.read<ReportsRepository>()),
-                    child: ReportsScreen(),
-                  );
-                },
-              ),
-=======
           '/': (_) => LoginScreen(),
           '/temp': (_) => TempScreen(),
->>>>>>> Stashed changes
         },
       ),
     );

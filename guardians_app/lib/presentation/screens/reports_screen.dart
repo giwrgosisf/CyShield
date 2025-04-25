@@ -24,7 +24,8 @@ class ReportsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => ReportsBloc(reportsRepository)..add(LoadReports()),
+      //create: (_) => ReportsBloc(reportsRepository)..add(LoadReports()),
+      create: (_) => ReportsBloc(context.read<ReportsRepository>()),
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: AppTheme.secondary,

@@ -16,7 +16,6 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final primary = Theme.of(context).primaryColor;
     return BlocProvider(
       create: (_) => LoginBloc(context.read<AuthRepository>()),
       child: Scaffold(
@@ -40,34 +39,8 @@ class LoginScreen extends StatelessWidget {
                     color: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
-                      side: const BorderSide(color: Color(0xFFE0E0E0)),
+                      side: const BorderSide(color: AppTheme.lightGray),
                     ),
-<<<<<<< Updated upstream
-                    const SizedBox(height: 24),
-
-                    // Email
-                    EmailInput(),
-                    const SizedBox(height: 16),
-
-                    // Password
-                    PasswordInput(),
-                    const SizedBox(height: 24),
-
-                    // Sign in button
-                    LoginButton(),
-                    const SizedBox(height: 12),
-
-                    // First time signup
-                    TextButton(
-                      onPressed: () {
-                        // navigate to register
-                      },
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: const [
-                          Text('Πρώτη φορά εδώ; ', style: TextStyle(color: Colors.black54)),
-                          Text('Εγγράψου εδώ.', style: TextStyle(color: AppTheme.secondary)),
-=======
                     elevation: 2,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
@@ -88,26 +61,26 @@ class LoginScreen extends StatelessWidget {
                                   context,
                                 ).pushNamed('/register'),
                             style: TextButton.styleFrom(
-                              foregroundColor: primary,
+                              foregroundColor: AppTheme.primary,
                             ),
-                            child: Text('Πρώτη φορά εδώ; Εγγράψου εδώ.', style: TextStyle(color: Colors.black)),
-                            
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                Text('Πρώτη φορά εδώ; ', style: TextStyle(color: Colors.black54)),
+                                Text('Εγγράψου εδώ.', style: TextStyle(color: AppTheme.primary)),
+                              ],
+                            ),
+
                           ),
->>>>>>> Stashed changes
                         ],
                       ),
                     ),
                   ),
 
-<<<<<<< Updated upstream
-
-                    const SizedBox(height: 16),
-=======
                   // Separator line
                   const SizedBox(height: 24),
                   Divider(color: Colors.grey[300], thickness: 1),
                   const SizedBox(height: 24),
->>>>>>> Stashed changes
 
                   // Google login button below
                   GoogleLoginButton(),
