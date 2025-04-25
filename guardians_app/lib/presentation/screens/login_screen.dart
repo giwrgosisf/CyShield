@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/login/login_bloc.dart';
 import '../../bloc/login/login_event.dart';
 import '../../bloc/login/login_state.dart';
+import '../../core/app_theme.dart';
 import '../../data/repositories/auth_repository.dart';
 import '../widgets/email_input.dart';
 import '../widgets/password_input.dart';
@@ -57,8 +58,15 @@ class LoginPage extends StatelessWidget {
                       onPressed: () {
                         // navigate to register
                       },
-                      child: Text('Πρώτη φορά εδώ; Εγγράψου εδώ.'),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Text('Πρώτη φορά εδώ; ', style: TextStyle(color: Colors.black54)),
+                          Text('Εγγράψου εδώ.', style: TextStyle(color: AppTheme.secondary)),
+                        ],
+                      ),
                     ),
+
 
                     const SizedBox(height: 16),
 

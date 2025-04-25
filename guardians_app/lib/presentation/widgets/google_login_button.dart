@@ -11,7 +11,7 @@ class GoogleLoginButton extends StatelessWidget {
     return OutlinedButton.icon(
       key: const Key('login_google_button'),
       icon: Image.asset('assets/google_logo.png', height: 24),
-      label: Text('Σύνδεση μέσω Google'),
+      label: Text('Σύνδεση μέσω Google',style:TextStyle(color:Colors.black)),
       onPressed: () => context.read<LoginBloc>().add(LoginWithGooglePressed()),
       style: OutlinedButton.styleFrom(minimumSize: Size(double.infinity, 48)),
     );

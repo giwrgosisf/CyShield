@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:guardians_app/data/repositories/reports_repository.dart';
+import 'package:guardians_app/presentation/screens/reports_screen.dart';
+import 'bloc/reports/reports_bloc.dart';
 import 'data/repositories/auth_repository.dart';
 import 'presentation/screens/login_screen.dart';
 import 'presentation/screens/temp.dart';
@@ -15,15 +18,29 @@ class CyShieldGuardiansApp extends StatelessWidget {
   const CyShieldGuardiansApp({super.key});
 
   @override
+  @override
   Widget build(BuildContext context) {
-    return RepositoryProvider(
-      create: (_) => AuthRepository(),
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(create: (_) => AuthRepository()),
+        RepositoryProvider(create: (_) => ReportsRepository()),
+      ],
       child: MaterialApp(
         title: 'CyShieldGuardians',
         theme: ThemeData(primarySwatch: Colors.blue),
         routes: {
           '/': (_) => LoginPage(),
-          '/temp': (_) => TempScreen(),
+
+          '/ReportsScreen': (context) =>
+              Builder(
+                builder: (context) {
+                  return BlocProvider(
+                    create: (_) =>
+                        ReportsBloc(context.read<ReportsRepository>()),
+                    child: ReportsScreen(),
+                  );
+                },
+              ),
         },
       ),
     );

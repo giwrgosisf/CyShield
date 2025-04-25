@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:guardians_app/core/app_theme.dart';
 import '../../../bloc/login/login_bloc.dart';
 import '../../../bloc/login/login_event.dart';
 import '../../../bloc/login/login_state.dart';
@@ -20,7 +21,8 @@ class LoginButton extends StatelessWidget {
             SnackBar(content: Text(state.errorMessage ?? 'Error')),
           );
         } else if (state.status == LoginStatus.success) {
-          Navigator.of(ctx).pushReplacementNamed('/temp');
+          Navigator.pushNamed(context, '/ReportsScreen');
+
         }
       },
       buildWhen: (prev, curr) => prev.status != curr.status,
@@ -28,6 +30,10 @@ class LoginButton extends StatelessWidget {
         return SizedBox(
           width: double.infinity,
           child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.secondary,
+              foregroundColor: Colors.white
+            ),
             onPressed:
                 state.status == LoginStatus.submitting
                     ? null    // disabled

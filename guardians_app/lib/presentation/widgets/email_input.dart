@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:guardians_app/core/app_theme.dart';
 import '../../../bloc/login/login_bloc.dart';
 import '../../../bloc/login/login_event.dart';
 import '../../../bloc/login/login_state.dart';
@@ -14,11 +15,20 @@ class EmailInput extends StatelessWidget {
       builder: (ctx, state) {
         return TextField(
           key: const Key('login_email_input'),
+          cursorColor:Colors.black,
           onChanged: (email) => ctx.read<LoginBloc>().add(EmailChanged(email)),
           decoration: InputDecoration(
             labelText: 'Email',
-            hintText: 'Συμπληρώσε εδώ',
+            hintText:  'Συμπληρώσε εδώ',
+            labelStyle: const TextStyle(color: Colors.black),
+            floatingLabelStyle: TextStyle(color: AppTheme.secondary),
             border: OutlineInputBorder(),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: AppTheme.secondary),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.black),
+            ),
           ),
         );
       },
