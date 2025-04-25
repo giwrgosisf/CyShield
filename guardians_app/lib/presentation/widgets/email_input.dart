@@ -19,6 +19,7 @@ class EmailInput extends StatelessWidget {
           onChanged: (email) => ctx.read<LoginBloc>().add(EmailChanged(email)),
           decoration: InputDecoration(
             labelText: 'Email',
+<<<<<<< Updated upstream
             hintText:  'Συμπληρώσε εδώ',
             labelStyle: const TextStyle(color: Colors.black),
             floatingLabelStyle: TextStyle(color: AppTheme.secondary),
@@ -28,6 +29,17 @@ class EmailInput extends StatelessWidget {
             ),
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(color: Colors.black),
+=======
+            hintText: 'Συμπλήρωσε εδώ',
+            // border: OutlineInputBorder(),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0xFF5FA6F9), width: 2),
+>>>>>>> Stashed changes
             ),
           ),
         );

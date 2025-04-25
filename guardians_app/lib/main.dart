@@ -29,6 +29,7 @@ class CyShieldGuardiansApp extends StatelessWidget {
         title: 'CyShieldGuardians',
         theme: ThemeData(primarySwatch: Colors.blue),
         routes: {
+<<<<<<< Updated upstream
           '/': (_) => LoginPage(),
 
           '/ReportsScreen': (context) =>
@@ -41,6 +42,10 @@ class CyShieldGuardiansApp extends StatelessWidget {
                   );
                 },
               ),
+=======
+          '/': (_) => LoginScreen(),
+          '/temp': (_) => TempScreen(),
+>>>>>>> Stashed changes
         },
       ),
     );

@@ -10,35 +10,39 @@ import '../widgets/password_input.dart';
 import '../widgets/login_button.dart';
 import '../widgets/google_login_button.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+
+class LoginScreen extends StatelessWidget {
+  const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final primary = Theme.of(context).primaryColor;
     return BlocProvider(
       create: (_) => LoginBloc(context.read<AuthRepository>()),
       child: Scaffold(
-        backgroundColor: Colors.grey[200],
-        body: Center(
+        backgroundColor: Colors.grey[100],
+        body: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              elevation: 4,
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Logo
-                    Image.asset(
-                      'assets/cyshield_logo.png',
-                      height: 250,
-                      width: 250,
-                      fit: BoxFit.contain,
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(
+                    'assets/cyshield_logo.png',
+                    height: 300,
+                    width: 300,
+                  ),
+                  const SizedBox(height: 12),
+                  // Email/password form card
+                  Card(
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      side: const BorderSide(color: Color(0xFFE0E0E0)),
                     ),
+<<<<<<< Updated upstream
                     const SizedBox(height: 24),
 
                     // Email
@@ -63,17 +67,51 @@ class LoginPage extends StatelessWidget {
                         children: const [
                           Text('Πρώτη φορά εδώ; ', style: TextStyle(color: Colors.black54)),
                           Text('Εγγράψου εδώ.', style: TextStyle(color: AppTheme.secondary)),
+=======
+                    elevation: 2,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 32,
+                      ),
+                      child: Column(
+                        children: [
+                          EmailInput(),
+                          const SizedBox(height: 16),
+                          PasswordInput(),
+                          const SizedBox(height: 24),
+                          LoginButton(),
+                          const SizedBox(height: 12),
+                          TextButton(
+                            onPressed:
+                                () => Navigator.of(
+                                  context,
+                                ).pushNamed('/register'),
+                            style: TextButton.styleFrom(
+                              foregroundColor: primary,
+                            ),
+                            child: Text('Πρώτη φορά εδώ; Εγγράψου εδώ.', style: TextStyle(color: Colors.black)),
+                            
+                          ),
+>>>>>>> Stashed changes
                         ],
                       ),
                     ),
+                  ),
 
+<<<<<<< Updated upstream
 
                     const SizedBox(height: 16),
+=======
+                  // Separator line
+                  const SizedBox(height: 24),
+                  Divider(color: Colors.grey[300], thickness: 1),
+                  const SizedBox(height: 24),
+>>>>>>> Stashed changes
 
-                    // Google
-                    GoogleLoginButton(),
-                  ],
-                ),
+                  // Google login button below
+                  GoogleLoginButton(),
+                ],
               ),
             ),
           ),
