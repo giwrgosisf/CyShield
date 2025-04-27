@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guardians_app/data/repositories/reports_repository.dart';
-import 'package:guardians_app/presentation/screens/reports_screen.dart';
-import 'bloc/reports/reports_bloc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'data/repositories/auth_repository.dart';
 import 'presentation/screens/login_screen.dart';
+import 'presentation/screens/register_screen.dart';
 import 'presentation/screens/temp.dart';
 
 void main() async {
@@ -21,7 +21,7 @@ class CyShieldGuardiansApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
-        RepositoryProvider(create: (_) => AuthRepository()),
+        RepositoryProvider(create: (_) => AuthRepository(firestore: FirebaseFirestore.instance)),
         RepositoryProvider(create: (_) => ReportsRepository()),
       ],
       child: MaterialApp(
@@ -29,6 +29,7 @@ class CyShieldGuardiansApp extends StatelessWidget {
         theme: ThemeData(primarySwatch: Colors.blue),
         routes: {
           '/': (_) => LoginScreen(),
+          '/register': (_) => RegisterScreen(),
           '/temp': (_) => TempScreen(),
         },
       ),

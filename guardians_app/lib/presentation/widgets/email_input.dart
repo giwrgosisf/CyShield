@@ -1,37 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guardians_app/core/app_theme.dart';
-import '../../../bloc/login/login_bloc.dart';
-import '../../../bloc/login/login_event.dart';
-import '../../../bloc/login/login_state.dart';
+
 
 class EmailInput extends StatelessWidget {
-  const EmailInput({super.key});
+  const EmailInput({super.key, required this.value, required this.onChanged});
+
+  final String value;
+  final ValueChanged<String> onChanged;
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<LoginBloc, LoginState>(
-      buildWhen: (p, c) => p.email != c.email,
-      builder: (ctx, state) {
-        return TextField(
-          key: const Key('login_email_input'),
-          cursorColor: Colors.black,
-          onChanged: (email) => ctx.read<LoginBloc>().add(EmailChanged(email)),
-          decoration: InputDecoration(
-            labelText: 'Email',
-            hintText: 'Συμπλήρωσε εδώ',
-            // border: OutlineInputBorder(),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppTheme.lightGray),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppTheme.primary, width: 2),
-            ),
-          ),
-        );
-      },
+    return TextField(
+      keyboardType: TextInputType.emailAddress,
+      key: const Key('login_email_input'),
+      cursorColor: Colors.black,
+      onChanged: onChanged,
+      // controller: TextEditingController(text: value)
+      //   ..selection = TextSelection.collapsed(offset: value.length),
+      decoration: InputDecoration(
+        labelText: 'Email',
+        hintText: 'Συμπλήρωσε εδώ',
+        // border: OutlineInputBorder(),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: AppTheme.lightGray),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: AppTheme.primary, width: 2),
+        ),
+      ),
     );
   }
 }

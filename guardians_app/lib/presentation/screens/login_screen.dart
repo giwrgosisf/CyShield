@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/login/login_bloc.dart';
-import '../../bloc/login/login_event.dart';
-import '../../bloc/login/login_state.dart';
 import '../../core/app_theme.dart';
 import '../../data/repositories/auth_repository.dart';
 import '../widgets/email_input.dart';
 import '../widgets/password_input.dart';
 import '../widgets/login_button.dart';
 import '../widgets/google_login_button.dart';
-
+import '../../../bloc/login/login_event.dart';
+import '../../../bloc/login/login_state.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -49,9 +48,28 @@ class LoginScreen extends StatelessWidget {
                       ),
                       child: Column(
                         children: [
-                          EmailInput(),
+                          BlocBuilder<LoginBloc, LoginState>(
+                            buildWhen: (p, c) => p.email != c.email,
+                            builder:
+                                (context, state) => EmailInput(
+                                  value: state.email,
+                                  onChanged:
+                                      (v) => context.read<LoginBloc>().add(
+                                        EmailChanged(v),
+                                      ),
+                                ),
+                          ),
                           const SizedBox(height: 16),
-                          PasswordInput(),
+                          BlocBuilder<LoginBloc, LoginState>(
+                            buildWhen: (p, c) => p.password != c.password,
+                            builder:
+                                (context, state) => PasswordInput(
+                              onChanged:
+                                  (v) => context.read<LoginBloc>().add(
+                                PasswordChanged(v),
+                              ),
+                            ),
+                          ),
                           const SizedBox(height: 24),
                           LoginButton(),
                           const SizedBox(height: 12),
@@ -65,12 +83,23 @@ class LoginScreen extends StatelessWidget {
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
-                              children: const [
-                                Text('Πρώτη φορά εδώ; ', style: TextStyle(color: Colors.black54)),
-                                Text('Εγγράψου εδώ.', style: TextStyle(color: AppTheme.primary)),
+                              children: [
+                                const Text(
+                                  'Πρώτη φορά εδώ; ',
+                                  style: TextStyle(color: Colors.black54),
+                                ),
+                                TextButton(
+                                  onPressed:
+                                      () => Navigator.of(
+                                        context,
+                                      ).pushNamed('/register'),
+                                  child: const Text(
+                                    'Εγγράψου εδώ.',
+                                    style: TextStyle(color: AppTheme.primary),
+                                  ),
+                                ),
                               ],
                             ),
-
                           ),
                         ],
                       ),

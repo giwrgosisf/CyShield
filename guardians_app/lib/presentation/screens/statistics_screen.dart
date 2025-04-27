@@ -7,7 +7,6 @@ import '../../bloc/reports/reports_bloc.dart';
 import '../../bloc/reports/reports_event.dart';
 import '../../bloc/statistics/statistics_bloc.dart';
 import '../../bloc/statistics/statistics_state.dart';
-import '../../models/child_model.dart';
 import '../widgets/child_statistics_card.dart';
 import '../../data/repositories/reports_repository.dart';
 
