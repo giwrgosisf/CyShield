@@ -1,0 +1,36 @@
+
+
+services:
+  telegram-backend-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: telegram-backend-container
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app/sessions:/app/app/sessions:rw
+      - ./app/credentials:/app/app/credentials:rw
+    environment:
+      - PYTHONPATH=/app
+    command: >
+      bash -c "
+        uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload   
+      "
+    
+
+  telegram-listener:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: telegram-listener
+    depends_on:
+      - telegram-backend-server
+    environment:
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+    command: >
+      python3 -m app.telegram_listener
+    volumes:
+    - ./app/sessions:/app/app/sessions:rw
+    - ./app/credentials:/app/app/credentials:rw
