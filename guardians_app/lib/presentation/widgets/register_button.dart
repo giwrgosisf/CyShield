@@ -21,7 +21,7 @@ class RegisterButton extends StatelessWidget {
             SnackBar(content: Text(state.errorMessage ?? 'Error')),
           );
         } else if (state.status == RegisterStatus.success) {
-          Navigator.of(ctx).pushReplacementNamed('/temp');
+          Navigator.of(ctx).pushReplacementNamed('/home');
         }
       },
       buildWhen: (prev, curr) => prev.status != curr.status,

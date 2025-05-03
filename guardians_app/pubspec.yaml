@@ -88,9 +88,11 @@ flutter:
   assets:
     # one line – the trailing slash tells Flutter to include everything
     - assets/
+    - assets/images/
     - assets/images/Marie.png
     - assets/images/austin.png
     - assets/images/profilePicture.png
+    - assets/icons/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
