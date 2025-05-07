@@ -1,0 +1,35 @@
+# This is a Docker Compose file for setting up a Signal API and a Node.js application.
+# The Signal API is used to send and receive messages via the Signal messaging service.
+# The Node.js application interacts with the Signal API to perform various tasks.
+services:
+  signal-api:
+    image: bbernhard/signal-cli-rest-api:latest
+    # image: bbernhard/signal-cli-rest-api:latest
+    # name: signal-api
+    # container_name: signal-api
+    container_name: signal-api
+    #signal api exposed on port 8081 in the host machine and 8080 in the container
+    ports:
+      - "8081:8080"    
+    volumes:
+      - signal-data:/root/.local/share/signal-cli/data
+    restart: unless-stopped
+    environment:
+      - MODE=link  
+  # The Node.js application
+  # This service is built from the Dockerfile in the ./node-app directory.
+  # It depends on the signal-api service to be up and running before it starts.
+  # The application is exposed on port 3000 of the host machine and 3000 of the container.
+  node-app:
+    build: ./node-app
+    container_name: node-app
+    depends_on:
+      - signal-api
+    volumes:
+      - ./node-app:/app
+    ports:
+      - "3000:3000"    
+    restart: unless-stopped
+
+volumes:
+  signal-data:
