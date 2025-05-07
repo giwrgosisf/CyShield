@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Link Your Signal Device</title>
+  <style>
+    body {
+      text-align: center;
+      padding-top: 50px;
+      font-family: Arial, sans-serif;
+    }
+    #qr {
+      border: 1px solid black;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Scan this QR code with your Signal app</h2>
+  <img id="qr" alt="QR Code" />
+  <p>Device ID: <code id="device-id">Loading...</code></p>
+
+  <script>
+    fetch('/link')
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('qr').src = 'data:image/png;base64,' + data.qrCode;
+        document.getElementById('device-id').textContent = data.userId;
+      })
+      .catch(err => {
+        document.body.innerHTML = '<h1>Failed to load QR code</h1><pre>' + err.message + '</pre>';
+        console.error('QR code fetch error:', err);
+      });
+  </script>
+</body>
+</html>
