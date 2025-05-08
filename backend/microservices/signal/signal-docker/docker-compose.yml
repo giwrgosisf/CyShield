@@ -14,8 +14,18 @@ services:
     volumes:
       - signal-data:/root/.local/share/signal-cli/data
     restart: unless-stopped
+    # The Signal API is configured to use a JSON-RPC interface.
+    # The environment variable MODE is set to json-rpc to enable this interface.
+    # The command starts the supervisor service and keeps the container running.
+    # The supervisor service is responsible for managing the Signal API process.
+    # The tail command keeps the container running indefinitely.
+    # The signal-api service is configured to use a volume for persistent data storage.
     environment:
-      - MODE=link  
+      - MODE=json-rpc
+    command: /bin/bash -c "service supervisor start && tail -f /dev/null"
+    
+
+
   # The Node.js application
   # This service is built from the Dockerfile in the ./node-app directory.
   # It depends on the signal-api service to be up and running before it starts.
@@ -27,6 +37,7 @@ services:
       - signal-api
     volumes:
       - ./node-app:/app
+      - /app/node_modules
     ports:
       - "3000:3000"    
     restart: unless-stopped

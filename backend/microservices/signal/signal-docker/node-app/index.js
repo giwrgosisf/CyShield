@@ -1,19 +1,29 @@
-const express = require('express');
-const axios = require('axios');
-const path = require('path');
-const db = require('./db');
-const messageHandler = require('./messageHandler');
+import express, { json, urlencoded, static as serveStatic } from 'express';
+import axios from 'axios';
+import { addUser } from './db.js';
+import { startWebSocketListeners, connectUser } from './messageHandler.js';
 
 const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static('public'));
+app.use(json());
+app.use(urlencoded({ extended: true }));
+app.use(serveStatic('public'));
 
 const SIGNAL_API = 'http://signal-api:8080';
 //Polling is a process that runs in the background to check for new messages
 // and handle them accordingly. It is typically used in messaging applications
 // to ensure that users receive messages in real-time or near real-time.
-messageHandler.startPolling();
+
+// Boot function
+// This function is called when the server starts.
+// It waits for 10 seconds before starting the WebSocket listeners.
+// This delay allows the signal-api to initialize properly.
+// The function uses a Promise to create a delay.
+// The setTimeout function is used to create the delay.
+// The startWebSocketListeners function is called after the delay
+async function boot() {
+  await new Promise(r => setTimeout(r, 10000));
+  startWebSocketListeners();
+}
 
 // Link Signal device
 // This endpoint generates a QR code link for the user to scan with their Signal app
@@ -68,7 +78,9 @@ app.post('/verify', async (req, res) => {
   if (!uuid || !phone) return res.status(400).send("uuid and phone are required");
 
   try {
-    await db.addUser(uuid, phone);
+    await addUser(uuid, phone);
+    connectUser({ phone, uuid });
+    console.log(`Device linked: ${uuid} -> ${phone}`);
     res.send(`
       <html><body style="text-align:center; padding-top:50px;">
         <h2>Success!</h2>
@@ -84,4 +96,5 @@ app.post('/verify', async (req, res) => {
 
 app.listen(3000, () => {
   console.log("Node app listening on port 3000");
+  boot();
 });

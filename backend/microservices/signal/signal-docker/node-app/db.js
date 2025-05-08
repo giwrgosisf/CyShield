@@ -1,4 +1,4 @@
-const sqlite3 = require('sqlite3').verbose();
+import sqlite3 from 'sqlite3';
 const db = new sqlite3.Database('./signal_users.db');
 //  Create the database file if it doesn't exist
 // and create the users table
@@ -19,25 +19,25 @@ db.serialize(() => {
   `);
 });
 
-module.exports = {
-  addUser(uuid, phone) {
-    return new Promise((resolve, reject) => {
-      db.run(
-        "INSERT OR IGNORE INTO users (uuid, phone) VALUES (?, ?)",
-        [uuid, phone],
-        function(err) {
-          if (err) return reject(err);
-          resolve();
-        }
-      );
-    });
-  },
-  getAllUsers() {
-    return new Promise((resolve, reject) => {
-      db.all("SELECT * FROM users", (err, rows) => {
+export function addUser(uuid, phone) {
+  return new Promise((resolve, reject) => {
+    db.run(
+      "INSERT OR IGNORE INTO users (uuid, phone) VALUES (?, ?)",
+      [uuid, phone],
+      function (err) {
         if (err) return reject(err);
-        resolve(rows);
-      });
+        resolve();
+      }
+    );
+  });
+}
+export function getAllUsers() {
+  return new Promise((resolve, reject) => {
+    db.all("SELECT * FROM users", (err, rows) => {
+      if (err) return reject(err);
+      resolve(rows);
     });
-  }
-};
+  });
+}
+
+
