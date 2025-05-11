@@ -45,7 +45,7 @@ class LoginButton extends StatelessWidget {
                     ? SizedBox(
                       height: 16,
                       width: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                      child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primary),
                     )
                     : Text('Σύνδεσου', style: TextStyle(color: Colors.white)),
           ),

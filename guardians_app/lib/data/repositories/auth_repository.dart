@@ -82,7 +82,12 @@ class AuthRepository {
     await Future.wait([_firebaseAuth.signOut(), _googleSignIn.signOut()]);
   }
 
+
   // Stream<DocumentSnapshot<Map<String, dynamic>>> userProfileStream(String uid) {
   //   return _firestore.collection('users').doc(uid).snapshots();
   // }
+
+  User? get currentUser => _firebaseAuth.currentUser;
+  String? get currentUserUid => _firebaseAuth.currentUser?.uid;
+  Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
 }

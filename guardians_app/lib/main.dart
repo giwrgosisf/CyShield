@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guardians_app/data/repositories/reports_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-
 import 'bloc/home/home_cubit.dart';
 import 'data/repositories/auth_repository.dart';
 import 'data/repositories/user_repository.dart';
@@ -38,34 +37,37 @@ class CyShieldGuardiansApp extends StatelessWidget {
           create: (_) => FirebaseUserRepository(),
         ),
       ],
-      child: MultiBlocProvider(providers: [
-        BlocProvider(create: (ctx) => HomeCubit(ctx.read<UserRepository>())),
-      ],
-        child: MaterialApp(
-          title: 'CyShieldGuardians',
-          theme: ThemeData(primarySwatch: Colors.blue),
-          initialRoute: '/',
-          onGenerateRoute: (settings) {
-            switch (settings.name) {
-              case '/':
-                return MaterialPageRoute(builder: (_) => const LoginScreen());
-              case '/register':
-                return MaterialPageRoute(builder: (_) => const RegisterScreen());
-              case '/home':
-                return MaterialPageRoute(builder: (_) => const HomeScreen());
-              case '/reports':
-                return MaterialPageRoute(builder: (_) => ReportsScreen());
-              case '/statistics':
-                return MaterialPageRoute(builder: (_) => StatisticsScreen());
-              default:
-                return MaterialPageRoute(
-                  builder: (_) => const Scaffold(
-                    body: Center(child: Text('404 – Page not found')),
-                  ),
-                );
-            }
-          },
-        ),
+      child: MaterialApp(
+        title: 'CyShieldGuardians',
+        theme: ThemeData(primarySwatch: Colors.blue),
+        initialRoute: '/',
+        onGenerateRoute: (settings) {
+          switch (settings.name) {
+            case '/':
+              return MaterialPageRoute(builder: (_) => const LoginScreen());
+            case '/register':
+              return MaterialPageRoute(builder: (_) => const RegisterScreen());
+            case '/home':
+              return MaterialPageRoute(
+                builder:
+                    (ctx) => BlocProvider(
+                      create: (_) => HomeCubit(ctx.read<UserRepository>()),
+                      child: const HomeScreen(),
+                    ),
+              );
+            case '/reports':
+              return MaterialPageRoute(builder: (_) => ReportsScreen());
+            case '/statistics':
+              return MaterialPageRoute(builder: (_) => StatisticsScreen());
+            default:
+              return MaterialPageRoute(
+                builder:
+                    (_) => const Scaffold(
+                      body: Center(child: Text('404 – Page not found')),
+                    ),
+              );
+          }
+        },
       ),
     );
   }

@@ -64,11 +64,11 @@ class LoginScreen extends StatelessWidget {
                             buildWhen: (p, c) => p.password != c.password,
                             builder:
                                 (context, state) => PasswordInput(
-                              onChanged:
-                                  (v) => context.read<LoginBloc>().add(
-                                PasswordChanged(v),
-                              ),
-                            ),
+                                  onChanged:
+                                      (v) => context.read<LoginBloc>().add(
+                                        PasswordChanged(v),
+                                      ),
+                                ),
                           ),
                           const SizedBox(height: 24),
                           LoginButton(),
@@ -84,11 +84,15 @@ class LoginScreen extends StatelessWidget {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Text(
-                                  'Πρώτη φορά εδώ; ',
-                                  style: TextStyle(color: Colors.black54),
+                                Flexible(
+                                  child: Text(
+                                    'Πρώτη φορά εδώ;',
+                                    style: TextStyle(color: Colors.black54),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
-                                TextButton(
+                                Flexible(
+                                child: TextButton(
                                   onPressed:
                                       () => Navigator.of(
                                         context,
@@ -96,7 +100,9 @@ class LoginScreen extends StatelessWidget {
                                   child: const Text(
                                     'Εγγράψου εδώ.',
                                     style: TextStyle(color: AppTheme.primary),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
+                                ),
                                 ),
                               ],
                             ),

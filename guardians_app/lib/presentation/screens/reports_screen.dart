@@ -123,7 +123,7 @@ class ReportsScreen extends StatelessWidget {
               child: BlocBuilder<ReportsBloc, ReportsState>(
                 builder: (context, state) {
                   if (state is ReportsLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator(color: AppTheme.primary));
                   } else if (state is ReportsLoaded) {
                     return ListView.builder(
                       itemCount: state.children.length,

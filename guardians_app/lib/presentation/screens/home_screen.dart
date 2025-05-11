@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:guardians_app/bloc/profile/profile_cubit.dart';
+import 'package:guardians_app/data/repositories/auth_repository.dart';
+import 'package:guardians_app/data/repositories/user_repository.dart';
+import 'package:guardians_app/presentation/screens/profile_screen.dart';
 import '../../bloc/home/home_cubit.dart';
 import '../../bloc/home/home_state.dart';
 import '../../core/app_theme.dart';
@@ -26,7 +30,7 @@ class HomeScreen extends StatelessWidget {
       builder: (context, state) {
         if (state.status == HomeStatus.loading) {
           return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+            body: Center(child: CircularProgressIndicator(color: AppTheme.primary)),
           );
         }
 
@@ -76,7 +80,25 @@ class HomeScreen extends StatelessWidget {
               borderRadius: BorderRadius.vertical(bottom: Radius.circular(12)),
             ),
           ),
-          body: _Body(firstName: firstName),
+          body: IndexedStack(
+            index: state.selectedTab,
+            children: [
+              _Body(firstName: firstName),
+              const Center(child: Text('Οικογένεια')),
+
+              const Center(child: Text('Ειδοποιήσεις')),
+
+
+              BlocProvider(
+                create:
+                    (_) => ProfileCubit(
+                      context.read<AuthRepository>(),
+                      context.read<UserRepository>(),
+                    ),
+                child: const ProfileScreen(),
+              ),
+            ],
+          ),
           bottomNavigationBar: BottomNav(
             current: state.selectedTab,
             onTap: (i) => context.read<HomeCubit>().selectTab(i),

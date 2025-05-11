@@ -120,7 +120,7 @@ class StatisticsScreen extends StatelessWidget {
             child: BlocBuilder<StatisticsBloc, StatisticsState>(
               builder: (context, state) {
                 if (state is StatisticsLoading) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator(color: AppTheme.primary));
                 } else if (state is StatisticsLoaded) {
                   return ListView.builder(
                     itemCount: state.children.length,

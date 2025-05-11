@@ -45,7 +45,7 @@ class RegisterButton extends StatelessWidget {
                 ? SizedBox(
               height: 16,
               width: 16,
-              child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.thirdBlue),
+              child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primary),
             )
                 : Text('Εγγράψου', style: TextStyle(color: Colors.white)),
           ),
