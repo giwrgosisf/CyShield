@@ -31,14 +31,7 @@ class ProfileScreen extends StatelessWidget {
               ),
           child: BlocListener<ProfileCubit, ProfileState>(
             listener: (ctx, state) {
-              if (state.status == ProfileStatus.deleted) {
-                // close the HomeCubit's subscription
-                ctx.read<HomeCubit>().close();
-                // navigate back to login
-                Navigator.of(ctx).pushNamedAndRemoveUntil('/', (_) => false);
-              }
               if (state.status == ProfileStatus.failure) {
-
                 ScaffoldMessenger.of(ctx,).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
               }
             },
@@ -144,17 +137,8 @@ class _Body extends StatelessWidget {
                         () => showDialog(
                           context: context,
                           builder:
-                              (dialogCtx) => MultiBlocProvider(
-                                providers: [
-                                  BlocProvider.value(
-                                    value: context.read<ProfileCubit>(),
-                                  ),
-                                  BlocProvider.value(
-                                    value: context.read<HomeCubit>(),
-                                  ), //  ← add this
-                                ],
-                                child: const confirmDelete(),
-                              ),
+                              (dialogCtx) => BlocProvider.value(value: context.read<ProfileCubit>(),
+                              child: confirmDelete())
                         ),
                   ),
                   const SizedBox(height: 40),

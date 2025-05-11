@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guardians_app/data/repositories/reports_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:guardians_app/presentation/AuthNavigator.dart';
 
 import 'bloc/home/home_cubit.dart';
 import 'data/repositories/auth_repository.dart';
@@ -40,21 +41,11 @@ class CyShieldGuardiansApp extends StatelessWidget {
       child: MaterialApp(
         title: 'CyShieldGuardians',
         theme: ThemeData(primarySwatch: Colors.blue),
-        initialRoute: '/',
+        home: const AuthNavigator(),
         onGenerateRoute: (settings) {
           switch (settings.name) {
-            case '/':
-              return MaterialPageRoute(builder: (_) => const LoginScreen());
             case '/register':
               return MaterialPageRoute(builder: (_) => const RegisterScreen());
-            case '/home':
-              return MaterialPageRoute(
-                builder:
-                    (ctx) => BlocProvider(
-                      create: (_) => HomeCubit(ctx.read<UserRepository>()),
-                      child: const HomeScreen(),
-                    ),
-              );
             case '/reports':
               return MaterialPageRoute(builder: (_) => ReportsScreen());
             case '/statistics':
