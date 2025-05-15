@@ -65,7 +65,6 @@ class BottomNav extends StatelessWidget {
   final ValueChanged<int> onTap;
   const BottomNav({super.key, required this.current, required this.onTap});
 
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -81,7 +80,7 @@ class BottomNav extends StatelessWidget {
           child: NavigationBarTheme(
             data: NavigationBarThemeData(
               height: 32,
-              indicatorShape:  const StadiumBorder(),
+              indicatorShape: const StadiumBorder(),
               indicatorColor: AppTheme.secondary, // blue bubble
               labelTextStyle: WidgetStateProperty.resolveWith((states) {
                 final sel = states.contains(WidgetState.selected);
@@ -99,18 +98,32 @@ class BottomNav extends StatelessWidget {
               }),
             ),
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 20,0,0),
+              padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
               child: NavigationBar(
                 selectedIndex: current,
                 onDestinationSelected: onTap,
                 backgroundColor: Colors.transparent,
                 destinations: [
-                  _navbarIcon('Σπίτι','assets/icons/home_white.png', 'assets/icons/home.png'),
                   _navbarIcon(
-                    'Οικογένεια', 'assets/icons/family_white.png', 'assets/icons/family.png'
+                    'Σπίτι',
+                    'assets/icons/home_white.png',
+                    'assets/icons/home.png',
                   ),
-                  _navbarIcon('Ειδοποιήσεις', 'assets/icons/bell_white.png', 'assets/icons/bell.png'),
-                  _navbarIcon('Λογαριασμός', 'assets/icons/user_white.png', 'assets/icons/user.png'),
+                  _navbarIcon(
+                    'Οικογένεια',
+                    'assets/icons/family_white.png',
+                    'assets/icons/family.png',
+                  ),
+                  _navbarIcon(
+                    'Ειδοποιήσεις',
+                    'assets/icons/bell_white.png',
+                    'assets/icons/bell.png',
+                  ),
+                  _navbarIcon(
+                    'Λογαριασμός',
+                    'assets/icons/user_white.png',
+                    'assets/icons/user.png',
+                  ),
                 ],
               ),
             ),
@@ -120,7 +133,6 @@ class BottomNav extends StatelessWidget {
     );
   }
 
-
   static NavigationDestination _navbarIcon(
     String label,
     String filled,
@@ -128,8 +140,9 @@ class BottomNav extends StatelessWidget {
   ) {
     return NavigationDestination(
       icon: Image.asset(idle, width: 22, height: 22),
-      selectedIcon: Image.asset(filled,width: 24, height: 24),
+      selectedIcon: Image.asset(filled, width: 24, height: 24),
       label: label,
+      tooltip: '',
     );
   }
 }

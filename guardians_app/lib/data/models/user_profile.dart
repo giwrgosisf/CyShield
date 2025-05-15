@@ -5,14 +5,17 @@ class UserProfile extends Equatable {
   final String firstName;
   final String lastName;
   final String? profilePhoto;
+  final List<String>? kids;
+  final List<String> pendingKids;
 
   const UserProfile({
     required this.uid,
     required this.firstName,
     required this.lastName,
     this.profilePhoto,
+    this.kids = const [],
+    this.pendingKids = const [],
   });
-
 
   String get displayName => firstName;
 
@@ -21,11 +24,19 @@ class UserProfile extends Equatable {
       uid: uid,
       firstName: data['name'] ?? '',
       lastName: data['surname'] ?? '',
-        profilePhoto: data['profilePhoto'] as String?,
+      profilePhoto: data['profilePhoto'] as String?,
+      kids: List<String>.from(data['kids'] ?? []),
+      pendingKids: List<String>.from(data['pendingKids'] ?? []),
     );
   }
 
   @override
-  List<Object?> get props => [uid, firstName, lastName, profilePhoto];
-
+  List<Object?> get props => [
+    uid,
+    firstName,
+    lastName,
+    profilePhoto,
+    kids,
+    pendingKids,
+  ];
 }

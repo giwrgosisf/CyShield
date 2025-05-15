@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:guardians_app/bloc/family/family_cubit.dart';
+import 'package:guardians_app/bloc/notifications/notifications_cubit.dart';
 import 'package:guardians_app/bloc/profile/profile_cubit.dart';
 import 'package:guardians_app/data/repositories/auth_repository.dart';
+import 'package:guardians_app/data/repositories/kid_repository.dart';
+import 'package:guardians_app/data/repositories/notifications_repository.dart';
 import 'package:guardians_app/data/repositories/user_repository.dart';
+import 'package:guardians_app/presentation/screens/family_screen.dart';
+import 'package:guardians_app/presentation/screens/notifications_screen.dart';
 import 'package:guardians_app/presentation/screens/profile_screen.dart';
 import '../../bloc/home/home_cubit.dart';
 import '../../bloc/home/home_state.dart';
 import '../../core/app_theme.dart';
 import '../../core/containers/strings.dart';
+import '../../data/repositories/reports_repository.dart';
 import '../widgets/bottom_navbar.dart';
 import '../widgets/card_button.dart';
 
@@ -30,7 +37,9 @@ class HomeScreen extends StatelessWidget {
       builder: (context, state) {
         if (state.status == HomeStatus.loading) {
           return const Scaffold(
-            body: Center(child: CircularProgressIndicator(color: AppTheme.primary)),
+            body: Center(
+              child: CircularProgressIndicator(color: AppTheme.primary),
+            ),
           );
         }
 
@@ -86,8 +95,13 @@ class HomeScreen extends StatelessWidget {
               _Body(firstName: firstName),
               const Center(child: Text('Οικογένεια')),
 
-              const Center(child: Text('Ειδοποιήσεις')),
-
+              BlocProvider(
+                create:
+                    (_) => NotificationsCubit(
+                      context.read<NotificationRepository>(),
+                ),
+                child: const NotificationsScreen(),
+              ),
 
               BlocProvider(
                 create:
@@ -96,6 +110,15 @@ class HomeScreen extends StatelessWidget {
                       context.read<UserRepository>(),
                     ),
                 child: const ProfileScreen(),
+              ),
+
+              BlocProvider(
+                create:
+                    (_) => FamilyCubit(
+                      context.read<UserRepository>(),
+                      context.read<KidRepository>(),
+                    ),
+                child: const FamilyScreen(),
               ),
             ],
           ),

@@ -92,17 +92,17 @@ class LoginScreen extends StatelessWidget {
                                   ),
                                 ),
                                 Flexible(
-                                child: TextButton(
-                                  onPressed:
-                                      () => Navigator.of(
-                                        context,
-                                      ).pushNamed('/register'),
-                                  child: const Text(
-                                    'Εγγράψου εδώ.',
-                                    style: TextStyle(color: AppTheme.primary),
-                                    overflow: TextOverflow.ellipsis,
+                                  child: TextButton(
+                                    onPressed:
+                                        () => Navigator.of(
+                                          context,
+                                        ).pushNamed('/register'),
+                                    child: const Text(
+                                      'Εγγράψου εδώ.',
+                                      style: TextStyle(color: AppTheme.primary),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
-                                ),
                                 ),
                               ],
                             ),

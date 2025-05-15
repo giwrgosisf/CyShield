@@ -43,7 +43,11 @@ class AuthRepository {
         'name': user.displayName?.split(' ').first ?? '',
         'surname': user.displayName?.split(' ').skip(1).join(' ') ?? '',
         'email': user.email,
+        'userID':user.uid,
+        'kids':<String>[],
+        'pendingKids':  <String>[],
         'createdAt': FieldValue.serverTimestamp(),
+        'fcmTokens': <String>[]
       });
     }
     return user;
@@ -71,8 +75,12 @@ class AuthRepository {
         'name': name,
         'surname': surname,
         'email': email,
+        'userID':user.uid,
+        'kids':<String>[],
+        'pendingKids':  <String>[],
         'birthdate': Timestamp.fromDate(birthDate),
         'createdAt': FieldValue.serverTimestamp(),
+        'fcmTokens': <String>[]
       });
     }
     return user;

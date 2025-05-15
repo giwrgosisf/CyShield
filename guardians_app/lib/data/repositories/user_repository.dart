@@ -11,6 +11,13 @@ abstract class UserRepository {
   Future<void> updatePhotoUrl(String url);
   Future<void> deleteProfile();
 
+  Future<void> addKid(String kidId);
+  Future<void> removeKid(String kidId);
+
+  // Future<void> sendKidRequest(String childId);
+  // Future<void> rejectKidRequest(String childId);
+  // Future<void> acceptKidRequest(String childId);
+
   Stream<UserProfile> watchCurrentUser();
 }
 
@@ -33,7 +40,7 @@ class FirebaseUserRepository implements UserRepository {
   @override
   Stream<UserProfile> watchCurrentUser() {
     final user = _auth.currentUser;
-    if (user == null){
+    if (user == null) {
       return const Stream<UserProfile>.empty();
     }
     final uid = user.uid;
@@ -51,7 +58,6 @@ class FirebaseUserRepository implements UserRepository {
 
   String get _uid => _auth.currentUser!.uid;
 
-
   @override
   Future<void> updateUsername(String newName) {
     return _db.collection('users').doc(_uid).update({'name': newName});
@@ -59,13 +65,48 @@ class FirebaseUserRepository implements UserRepository {
 
   @override
   Future<void> updatePhotoUrl(String url) {
-   return _db.collection('users').doc(_uid).update({'profilePhoto': url});
+    return _db.collection('users').doc(_uid).update({'profilePhoto': url});
   }
 
   @override
   Future<void> deleteProfile() async {
-    await _db.collection('users').doc(_uid).delete();     // Firestore
-    await _auth.currentUser!.delete();                    // Firebase Auth
+    await _db.collection('users').doc(_uid).delete(); // Firestore
+    await _auth.currentUser!.delete(); // Firebase Auth
   }
 
+  @override
+  Future<void> addKid(String kidId) {
+    return _db.collection('users').doc(_uid).update({
+      'kids': FieldValue.arrayUnion([kidId]),
+    });
+  }
+
+  @override
+  Future<void> removeKid(String kidId) {
+    return _db.collection('users').doc(_uid).update({
+      'kids': FieldValue.arrayRemove([kidId]),
+    });
+  }
+
+  // @override
+  // Future<void> sendKidRequest(String childId) {
+  //   return _db.collection('users').doc(_uid).update({
+  //     'pendingKids': FieldValue.arrayUnion([childId]),
+  //   });
+  // }
+  //
+  // @override
+  // Future<void> rejectKidRequest(String childId) {
+  //   return _db.collection('users').doc(_uid).update({
+  //     'pendingKids': FieldValue.arrayRemove([childId]),
+  //   });
+  // }
+  //
+  // @override
+  // Future<void> acceptKidRequest(String childId) {
+  //   return _db.collection('users').doc(_uid).update({
+  //     'pendingKids': FieldValue.arrayRemove([childId]),
+  //     'kids': FieldValue.arrayUnion([childId]),
+  //   });
+  // }
 }
