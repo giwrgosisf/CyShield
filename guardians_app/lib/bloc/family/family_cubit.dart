@@ -4,7 +4,6 @@ import 'package:guardians_app/data/models/kid_profile.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../../data/repositories/user_repository.dart';
-import '../../data/repositories/auth_repository.dart';
 import '../../data/repositories/kid_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'family_state.dart';

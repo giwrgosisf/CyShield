@@ -60,6 +60,100 @@ import 'package:guardians_app/core/app_theme.dart';
 //  bottom_navbar_m3.dart
 // ---------------------------------------------------------------------------
 
+// class BottomNav extends StatelessWidget {
+//   final int current;
+//   final ValueChanged<int> onTap;
+//   const BottomNav({super.key, required this.current, required this.onTap});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Padding(
+//       padding: const EdgeInsets.fromLTRB(12, 0, 12, 28),
+//       child: ClipRRect(
+//         borderRadius: BorderRadius.circular(12),
+//         child: Container(
+//           decoration: BoxDecoration(
+//             color: AppTheme.navbarBackground, // light‑grey bar fill
+//             borderRadius: BorderRadius.circular(12),
+//             border: Border.all(color: AppTheme.navbarOutline),
+//           ),
+//           child: NavigationBarTheme(
+//             data: NavigationBarThemeData(
+//               height: 28,
+//               indicatorShape: const StadiumBorder(),
+//               indicatorColor: AppTheme.secondary, // blue bubble
+//               labelTextStyle: WidgetStateProperty.resolveWith((states) {
+//                 final sel = states.contains(WidgetState.selected);
+//                 return TextStyle(
+//                   fontSize: 12,
+//                   fontWeight: sel ? FontWeight.w800 : FontWeight.w400,
+//                   color: sel ? AppTheme.thirdBlue : Colors.black,
+//                 );
+//               }),
+//               iconTheme: WidgetStateProperty.resolveWith((states) {
+//                 final sel = states.contains(WidgetState.selected);
+//                 return IconThemeData(
+//                   // size: sel ? 24 : 22,
+//                 );
+//               }),
+//             ),
+//             child: Padding(
+//               padding: const EdgeInsets.fromLTRB(0, 20, 0, 16),
+//               child: NavigationBar(
+//                 selectedIndex: current,
+//                 onDestinationSelected: (i){
+//                   const routes = ['/home','/family','/notifications','/profile'];
+//                   final dest = routes[i];
+//                   if (ModalRoute.of(context)?.settings.name != dest) {
+//                     Navigator.pushReplacementNamed(context, dest);
+//                   }
+//                 },
+//                 backgroundColor: Colors.transparent,
+//                 destinations: [
+//                   _navbarIcon(
+//                     'Σπίτι',
+//                     'assets/icons/home_white.png',
+//                     'assets/icons/home.png',
+//                   ),
+//                   _navbarIcon(
+//                     'Οικογένεια',
+//                     'assets/icons/family_white.png',
+//                     'assets/icons/family.png',
+//                   ),
+//                   _navbarIcon(
+//                     'Ειδοποιήσεις',
+//                     'assets/icons/bell_white.png',
+//                     'assets/icons/bell.png',
+//                   ),
+//                   _navbarIcon(
+//                     'Λογαριασμός',
+//                     'assets/icons/user_white.png',
+//                     'assets/icons/user.png',
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+//
+//   static NavigationDestination _navbarIcon(
+//     String label,
+//     String filled,
+//     String idle,
+//   ) {
+//     return NavigationDestination(
+//       icon: Image.asset(idle, width: 22, height: 22),
+//       selectedIcon: Image.asset(filled, width: 24, height: 24),
+//       label: label,
+//       tooltip: '',
+//     );
+//   }
+// }
+
+
 class BottomNav extends StatelessWidget {
   final int current;
   final ValueChanged<int> onTap;
@@ -68,18 +162,17 @@ class BottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 0, 12, 28),
+      padding: const EdgeInsets.fromLTRB(12, 0, 12, 2),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        child: Container(
-          decoration: BoxDecoration(
-            color: AppTheme.navbarBackground, // light‑grey bar fill
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppTheme.navbarOutline),
-          ),
+        // child: Container(
+        //   decoration: BoxDecoration(
+        //     color: AppTheme.navbarBackground, // light‑grey bar fill
+        //     borderRadius: BorderRadius.circular(12),
+        //     border: Border.all(color: AppTheme.navbarOutline),
+        //   ),
           child: NavigationBarTheme(
             data: NavigationBarThemeData(
-              height: 32,
               indicatorShape: const StadiumBorder(),
               indicatorColor: AppTheme.secondary, // blue bubble
               labelTextStyle: WidgetStateProperty.resolveWith((states) {
@@ -90,18 +183,25 @@ class BottomNav extends StatelessWidget {
                   color: sel ? AppTheme.thirdBlue : Colors.black,
                 );
               }),
-              iconTheme: WidgetStateProperty.resolveWith((states) {
-                final sel = states.contains(WidgetState.selected);
-                return IconThemeData(
-                  // size: sel ? 24 : 22,
-                );
-              }),
+              // iconTheme: WidgetStateProperty.resolveWith((states) {
+              //   final sel = states.contains(WidgetState.selected);
+              //   return IconThemeData(
+              //     // size: sel ? 24 : 22,
+              //   );
+              // }),
             ),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+            // child: Padding(
+            //   padding: const EdgeInsets.fromLTRB(0, 20, 0, 16),
               child: NavigationBar(
                 selectedIndex: current,
                 onDestinationSelected: onTap,
+                //     (i){
+                //   const routes = ['/home','/family','/notifications','/profile'];
+                //   final dest = routes[i];
+                //   if (ModalRoute.of(context)?.settings.name != dest) {
+                //     Navigator.pushReplacementNamed(context, dest);
+                //   }
+                // },
                 backgroundColor: Colors.transparent,
                 destinations: [
                   _navbarIcon(
@@ -126,18 +226,18 @@ class BottomNav extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
+            // ),
           ),
-        ),
+        // ),
       ),
     );
   }
 
   static NavigationDestination _navbarIcon(
-    String label,
-    String filled,
-    String idle,
-  ) {
+      String label,
+      String filled,
+      String idle,
+      ) {
     return NavigationDestination(
       icon: Image.asset(idle, width: 22, height: 22),
       selectedIcon: Image.asset(filled, width: 24, height: 24),

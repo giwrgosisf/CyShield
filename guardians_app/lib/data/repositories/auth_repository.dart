@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthRepository {
@@ -23,7 +24,11 @@ class AuthRepository {
       email: email,
       password: password,
     );
-    return cred.user;
+    final user = cred.user;
+    if (user != null) {
+      await _saveFcmToken(user.uid);
+    }
+    return user;
   }
 
   Future<User?> signInWithGoogle() async {
@@ -47,8 +52,8 @@ class AuthRepository {
         'kids':<String>[],
         'pendingKids':  <String>[],
         'createdAt': FieldValue.serverTimestamp(),
-        'fcmTokens': <String>[]
       });
+      await _saveFcmToken(user.uid);
     }
     return user;
   }
@@ -80,8 +85,8 @@ class AuthRepository {
         'pendingKids':  <String>[],
         'birthdate': Timestamp.fromDate(birthDate),
         'createdAt': FieldValue.serverTimestamp(),
-        'fcmTokens': <String>[]
       });
+      await _saveFcmToken(user.uid);
     }
     return user;
   }
@@ -98,4 +103,17 @@ class AuthRepository {
   User? get currentUser => _firebaseAuth.currentUser;
   String? get currentUserUid => _firebaseAuth.currentUser?.uid;
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
+
+
+  Future<void> _saveFcmToken(String uid) async {
+    final token = await FirebaseMessaging.instance.getToken();
+    if (token != null) {
+      await _firestore
+          .collection('users')
+          .doc(uid)
+          .update({
+        'fcmTokens': FieldValue.arrayUnion([token]),
+      });
+    }
+  }
 }

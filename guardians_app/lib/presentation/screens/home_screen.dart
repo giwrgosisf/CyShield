@@ -1,133 +1,70 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:guardians_app/bloc/family/family_cubit.dart';
-import 'package:guardians_app/bloc/notifications/notifications_cubit.dart';
-import 'package:guardians_app/bloc/profile/profile_cubit.dart';
-import 'package:guardians_app/data/repositories/auth_repository.dart';
-import 'package:guardians_app/data/repositories/kid_repository.dart';
-import 'package:guardians_app/data/repositories/notifications_repository.dart';
-import 'package:guardians_app/data/repositories/user_repository.dart';
-import 'package:guardians_app/presentation/screens/family_screen.dart';
-import 'package:guardians_app/presentation/screens/notifications_screen.dart';
-import 'package:guardians_app/presentation/screens/profile_screen.dart';
+import 'package:guardians_app/presentation/widgets/custom_appbar.dart';
 import '../../bloc/home/home_cubit.dart';
 import '../../bloc/home/home_state.dart';
 import '../../core/app_theme.dart';
-import '../../core/containers/strings.dart';
-import '../../data/repositories/reports_repository.dart';
 import '../widgets/bottom_navbar.dart';
 import '../widgets/card_button.dart';
 
 class HomeScreen extends StatelessWidget {
+  static const _navIndex = 0;
+
+  static const _routes = ['/home', '/family', '/notifications', '/profile'];
+
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<HomeCubit, HomeState>(
-      listenWhen:
-          (prev, curr) =>
-              prev.status != curr.status && curr.status == HomeStatus.failure,
-      listener: (context, state) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(state.errorMessage ?? 'Error loading Home screen'),
-          ),
-        );
-      },
-      builder: (context, state) {
-        if (state.status == HomeStatus.loading) {
-          return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(color: AppTheme.primary),
-            ),
-          );
-        }
-
-        if (state.status == HomeStatus.failure) {
-          return Scaffold(
-            body: Center(
-              child: Text(state.errorMessage ?? 'Error loading Home screen'),
-            ),
-          );
-        }
-
-        final firstName = state.profile!.firstName;
-
-        return Scaffold(
-          appBar: AppBar(
-            backgroundColor: AppTheme.secondary,
-            actions: [
-              PopupMenuButton<String>(
-                icon: const Icon(Icons.more_vert, color: Colors.white),
-                onSelected: (value) {},
-                itemBuilder:
-                    (BuildContext context) => <PopupMenuEntry<String>>[
-                      const PopupMenuItem<String>(
-                        value: 'settings',
-                        child: Text('Settings'),
-                      ),
-                      const PopupMenuItem<String>(
-                        value: 'help',
-                        child: Text('Help'),
-                      ),
-                    ],
-              ),
-            ],
-            elevation: 10,
-            shadowColor: Colors.black.withAlpha((255).round()),
-            title: Text(
-              MyText.appTitle,
-              style: TextStyle(
-                color: Colors.white,
-                fontFamily: 'ArbutusSlab',
-                fontSize: 30,
-                letterSpacing: 1,
-              ),
-            ),
-            centerTitle: true,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(12)),
-            ),
-          ),
-          body: IndexedStack(
-            index: state.selectedTab,
-            children: [
-              _Body(firstName: firstName),
-              const Center(child: Text('Οικογένεια')),
-
-              BlocProvider(
-                create:
-                    (_) => NotificationsCubit(
-                      context.read<NotificationRepository>(),
+    return Scaffold(
+      appBar: const CustomAppBar(title: 'Cyshield'),
+      body: SafeArea(
+        child: BlocConsumer<HomeCubit, HomeState>(
+          listenWhen:
+              (prev, curr) =>
+                  prev.status != curr.status &&
+                  curr.status == HomeStatus.failure,
+          listener: (context, state) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  state.errorMessage ?? 'Error loading Home screen',
                 ),
-                child: const NotificationsScreen(),
               ),
+            );
+          },
+          builder: (context, state) {
+            switch (state.status) {
+              case HomeStatus.loading:
+                return const Center(
+                  child: CircularProgressIndicator(color: AppTheme.primary),
+                );
 
-              BlocProvider(
-                create:
-                    (_) => ProfileCubit(
-                      context.read<AuthRepository>(),
-                      context.read<UserRepository>(),
-                    ),
-                child: const ProfileScreen(),
-              ),
+              case HomeStatus.failure:
+                return Center(
+                  child: Text(
+                    state.errorMessage ?? 'Error loading Home screen',
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                );
 
-              BlocProvider(
-                create:
-                    (_) => FamilyCubit(
-                      context.read<UserRepository>(),
-                      context.read<KidRepository>(),
-                    ),
-                child: const FamilyScreen(),
-              ),
-            ],
-          ),
-          bottomNavigationBar: BottomNav(
-            current: state.selectedTab,
-            onTap: (i) => context.read<HomeCubit>().selectTab(i),
-          ),
-        );
-      },
+              case HomeStatus.success:
+                final firstName = state.profile!.firstName;
+                return _Body(firstName: firstName);
+            }
+          },
+        ),
+      ),
+      bottomNavigationBar: BottomNav(
+        current: _navIndex,
+        onTap: (i) {
+          final target = _routes[i];
+          // only navigate if we’re not already on that route
+          if (ModalRoute.of(context)!.settings.name != target) {
+            Navigator.pushReplacementNamed(context, target);
+          }
+        },
+      ),
     );
   }
 }
@@ -140,7 +77,7 @@ class _Body extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(16, 36, 16, 12),
+      padding: const EdgeInsets.fromLTRB(16, 36, 16, 36),
       child: Center(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,

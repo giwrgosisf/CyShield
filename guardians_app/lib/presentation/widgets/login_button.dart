@@ -21,6 +21,13 @@ class LoginButton extends StatelessWidget {
             SnackBar(content: Text(state.errorMessage ?? 'Error')),
           );
         }
+        else if (state.status == LoginStatus.success) {
+          // dispose the login page and go to /home
+          Navigator.of(ctx).pushNamedAndRemoveUntil(
+            '/home',
+                (_) => false,
+          );
+        }
       },
       buildWhen: (prev, curr) => prev.status != curr.status,
       builder: (ctx, state) {

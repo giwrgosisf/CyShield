@@ -3,14 +3,12 @@ import '../../models/message_model.dart';
 
 class ReportsRepository {
   Future<List<ChildModel>> getFlaggedReports() async {
-    await Future.delayed(Duration(seconds: 1));
-
     return [
       ChildModel(
         name: "Μαρία",
         avatar: "assets/images/Marie.png",
         safePercent: 0.7,
-        moderatePercent:0.2,
+        moderatePercent: 0.2,
         toxicPercent: 0.1,
         flaggedMessages: [
           MessageModel(
@@ -31,7 +29,7 @@ class ReportsRepository {
         name: "Μάριος",
         avatar: "assets/images/austin.png",
         safePercent: 0.7,
-        moderatePercent:0.1,
+        moderatePercent: 0.1,
         toxicPercent: 0.3,
         flaggedMessages: [
           MessageModel(
