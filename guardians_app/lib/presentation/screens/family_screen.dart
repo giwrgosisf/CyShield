@@ -33,18 +33,18 @@ class FamilyScreen extends StatelessWidget {
             }
 
             final kids = state.kids;
-            if (kids.isEmpty) {
-              return Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Text(
-                    'Δεν έχουν προστεθεί παιδιά ακόμα.',
-                    style: TextStyle(fontSize: 18),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              );
-            }
+            // if (kids.isEmpty) {
+            //   return Center(
+            //     child: Padding(
+            //       padding: const EdgeInsets.symmetric(horizontal: 24),
+            //       child: Text(
+            //         'Δεν έχουν προστεθεί παιδιά ακόμα.',
+            //         style: TextStyle(fontSize: 18),
+            //         textAlign: TextAlign.center,
+            //       ),
+            //     ),
+            //   );
+            // }
             return SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(16, 36, 16, 12),
               child: Column(
@@ -73,26 +73,43 @@ class FamilyScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: kids.length,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
+                  if (kids.isEmpty) ...[
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 24,
                         ),
-                    itemBuilder: (context, index) {
-                      final kid = kids[index];
-                      return KidCard(
-                        kid: kid,
-                        primaryColor: AppTheme.primary,
-                        onRemove:
-                            () => context.read<FamilyCubit>().removeKid(kid.id),
-                      );
-                    },
-                  ),
+                        child: Text(
+                          'Δεν έχουν προστεθεί παιδιά ακόμα.',
+                          style: const TextStyle(fontSize: 18),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ] else ...[
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: kids.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 16,
+                          ),
+                      itemBuilder: (context, index) {
+                        final kid = kids[index];
+                        return KidCard(
+                          kid: kid,
+                          primaryColor: AppTheme.primary,
+                          onRemove:
+                              () =>
+                                  context.read<FamilyCubit>().removeKid(kid.id),
+                        );
+                      },
+                    ),
+                  ],
 
                   const SizedBox(height: 32),
                   SizedBox(
@@ -103,7 +120,10 @@ class FamilyScreen extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.primary,
                       ),
-                      child: const Text('Πρόσθεσε παιδί'),
+                      child: const Text(
+                        'Πρόσθεσε παιδί',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                   ),
                 ],

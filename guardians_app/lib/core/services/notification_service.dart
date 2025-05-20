@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../bloc/home/home_cubit.dart';
 
 class NotificationService {
   static Future<void> initialize({
@@ -70,9 +68,8 @@ class NotificationService {
 
   static void _goToNotifications(GlobalKey<NavigatorState> navigatorKey) {
     final nav = navigatorKey.currentState!;
-    final ctx = navigatorKey.currentContext!;
+    //final ctx = navigatorKey.currentContext!;
     nav.popUntil((route) => route.isFirst);
-    // navigatorKey.currentState?.pushNamed('/notifications');
-    ctx.read<HomeCubit>().selectTab(2);
+    nav.pushNamed('/notifications');
   }
 }

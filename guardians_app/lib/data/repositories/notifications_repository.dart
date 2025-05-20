@@ -68,6 +68,7 @@ class NotificationRepository {
     for (var doc in snapshot.docs) {
       batch.update(doc.reference, {'seen': true});
     }
+    await batch.commit();
   }
 
   Future<void> markSeen(String notificationId) {

@@ -91,6 +91,7 @@ class _CyshieldGuardiansAppState extends State<CyShieldGuardiansApp> {
         ),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'CyShieldGuardians',
         theme: ThemeData(primarySwatch: Colors.blue,useMaterial3: true),
         home: const AuthNavigator(),
