@@ -1,0 +1,119 @@
+services:
+#-------------------------------------------
+# 1) Central Service
+#-------------------------------------------
+  central:
+    build:
+      context: ./microservices/CyShield-central
+      dockerfile: Dockerfile
+    container_name: CyShield-Central-Service
+    ports:
+      - "8000:8000"
+    
+    volumes:
+      # Mount your Firebase key into the container (read-only)
+      - ./microservices/CyShield-central/serviceAccountKey.json:/app/serviceAccountKey.json:ro
+    depends_on:
+        - telegram-backend-server
+        - telegram-listener
+        - signal-api
+        - node-app
+    restart: unless-stopped
+
+
+#-------------------------------------------
+# 2) Telegram Backend Service
+#-------------------------------------------
+  telegram-backend-server:
+    build:
+      context: ./microservices/telegram/telethondocker
+      dockerfile: Dockerfile
+    container_name: telegram-backend-container
+    ports:
+      - "7000:8000"
+    volumes:
+      - ./microservices/telegram/telethondocker/app/sessions:/app/app/sessions:rw
+      - ./microservices/telegram/telethondocker/app/credentials:/app/app/credentials:rw
+    environment:
+      - PYTHONPATH=/app
+    command: >
+      bash -c "
+        uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload   
+      "
+
+#-------------------------------------------
+# 3) Telegram Listener Service
+#-------------------------------------------
+  telegram-listener:
+    build:
+      context: ./microservices/telegram/telethondocker
+      dockerfile: Dockerfile
+    container_name: telegram-listener
+    depends_on:
+      - telegram-backend-server
+    environment:
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+    command: >
+      python3 -m app.telegram_listener
+    volumes:
+      - ./microservices/telegram/telethondocker/app/sessions:/app/app/sessions:rw
+      - ./microservices/telegram/telethondocker/app/credentials:/app/app/credentials:rw
+
+
+
+#-------------------------------------------
+# 4) Signal API Service
+#-------------------------------------------
+
+  signal-api:
+    image: bbernhard/signal-cli-rest-api:latest
+    container_name: signal-api
+    
+    ports:
+      - "8081:8080"    
+    volumes:
+      - signal-data:/root/.local/share/signal-cli/data
+    restart: unless-stopped
+  
+    environment:
+      - MODE=json-rpc
+    command: /bin/bash -c "service supervisor start && tail -f /dev/null"
+    
+
+
+#-------------------------------------------
+# 5) SIGNAL Node.js Application Service
+#-------------------------------------------
+  node-app:
+    build: 
+      context: ./microservices/signal/signal-docker/node-app
+      dockerfile: Dockerfile
+    container_name: node-app
+    depends_on:
+      - signal-api
+    volumes:
+      - ./microservices/signal/signal-docker/node-app:/app
+      - /app/node_modules
+    ports:
+      - "3001:3000"    
+    restart: unless-stopped
+
+    
+
+#-------------------------------------------
+# 6) Redis Service
+#-------------------------------------------
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+
+volumes:
+      signal-data:
+      redis-data:
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------

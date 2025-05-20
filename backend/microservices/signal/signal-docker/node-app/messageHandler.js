@@ -2,6 +2,8 @@ import WebSocket from 'ws';
 import { getAllUsers } from './db.js';
 
 const SIGNAL_API = 'ws://signal-api:8080';
+const TARGET_ENDPOINT = 'http://192.168.1.88:8000/message';
+
 
 // WebSocket is a protocol that provides full-duplex communication channels
 // over a single TCP connection. It is commonly used in real-time web applications
@@ -71,16 +73,61 @@ function handleMessage(user) {
         : user.name || user.phone;
       const body = env.dataMessage?.message || env.syncMessage?.sentMessage?.message;
       if (!body) return;
-      const timestamp = new Date(env.timestamp).toLocaleString();
+      const timestamp = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Europe/Athens',
+        dateStyle: 'short',
+        timeStyle: 'medium',
+      }).format(new Date(env.timestamp));
+
+      console.log('Envelope:', env);
+
       console.log(
         env.source === user.phone
           ? `[OUTGOING] ${senderName} -> ${receiverName} at ${timestamp}: ${body}`
           : `[INCOMING] ${receiverName} <- ${senderName} at ${timestamp}: ${body}`
       );
+
+      const payload = {
+        "user_id": env.source,
+        "message": {
+          "date " : timestamp,
+          "text":body,
+          "platform": "signal",
+          "from": {
+            "username": senderName,
+          },
+          "to": {
+            "username": receiverName,
+          }
+        } 
+      };
+
+      sendMessage(payload, user);
+
+
     } catch (err) {
       console.error(`Failed to process message for ${user.phone}:`, err.message);
     }
   };
+}
+
+
+async function sendMessage(payload, user) {
+  try {
+    const response = await fetch(TARGET_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to send message: ${response.statusText}`);
+    }
+    console.log(`Message sent successfully for ${user.phone}`);
+  } catch (error) {
+    console.error(`Error sending message for ${user.phone}:`, error);
+  }
 }
 
 export { startWebSocketListeners, connectUser };

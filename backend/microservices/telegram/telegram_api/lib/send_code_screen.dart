@@ -19,7 +19,7 @@ class _SendCodeScreenState extends State<SendCodeScreen> {
 
   Future<void> sendCode() async {
     final response = await http.post(
-      Uri.parse('http://192.168.1.79:8000/send-code'),
+      Uri.parse('http://apps.cyshield.org/send-code'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         "phone_number": _phoneController.text.trim(),

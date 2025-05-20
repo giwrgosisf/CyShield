@@ -7,11 +7,13 @@ import json
 import asyncio
 from telethon import TelegramClient, events
 import httpx
+from datetime import datetime
+from zoneinfo import ZoneInfo 
 
 
 CREDENTIALS_FILE = os.getenv("CREDENTIALS_FILE", "app/credentials/credentials.json")
 SESSIONS_DIR = os.getenv("SESSIONS_DIR", "app/sessions")
-#TARGET_ENDPOINT = os.getenv("TARGET_ENDPOINT", "http://192.168.1.91:9000/message")
+TARGET_ENDPOINT = os.getenv("TARGET_ENDPOINT", "http://192.168.1.88:8000/message")
 credits_lock = asyncio.Lock()
 
 
@@ -50,21 +52,17 @@ async def message_handler(event, phone_number: str):
     # For now, we are just printing the payload.
     # In the future, we will send this payload to the target endpoint.
     payload = {
-        "phone_number": phone_number,
+        "user_id": phone_number,
         "message": {
-            "id": message_id,
-            "date": message_date,
+            "date": datetime.fromisoformat(message_date).astimezone(ZoneInfo('Europe/Athens')).strftime('%B %d, %Y at %I:%M %p'),
             "text": message_text,
-            "from": {
-                "id": sender_id,
-                "username": sender_username,
-                "phone": sender_phone,
+            "platform": "Telegram",
+            "from": {  
+                "username": sender_name,
             },
-            "chat": {
-                "id": chat_id,
-                "title": chat_title,
-                "username": chat_username,
-            },
+            "to": {
+                "username": receiver_name,
+            }
         }
     }
 #   HTTP POST request to the target endpoint
@@ -72,11 +70,11 @@ async def message_handler(event, phone_number: str):
 #   for now, it's commented out to avoid sending requests to an undefined endpoint.
 
     # Non-blocking HTTP POST
-# async with httpx.AsyncClient() as http:
-#     try:
-#         await http.post(TARGET_ENDPOINT, json=payload)
-#     except Exception as e:
-#         print(f"Error forwarding message for {phone_number}: {e}")
+    async with httpx.AsyncClient() as http:
+     try:
+        await http.post(TARGET_ENDPOINT, json=payload)
+     except Exception as e:
+        print(f"Error forwarding message for {phone_number}: {e}")
 
 
 # Actively monitor messages for a single client
