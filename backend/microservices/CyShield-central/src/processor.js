@@ -9,6 +9,8 @@ const { notifyParent } = require("./fcmService");
 const { randomUUID } = require('crypto');
 
 
+const WORKER_CONCURRENCY = 4;
+
 const connection = new IORedis({
   host: process.env.REDIS_HOST || "redis",
   port: process.env.REDIS_PORT || 6379,
@@ -53,7 +55,7 @@ function spawnProcessor(queueName) {
     },
     {
       connection,
-      concurrency: os.cpus().length,
+      concurrency: WORKER_CONCURRENCY,
     }
   );
   worker.on("completed", (job) => {
