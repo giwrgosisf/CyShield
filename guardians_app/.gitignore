@@ -43,3 +43,31 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+
+
+# Firebase Android
+android/app/google-services.json
+
+# Firebase iOS
+ios/Runner/GoogleService-Info.plist
+
+# Firebase macOS (if using macOS)
+macos/Runner/GoogleService-Info.plist
+
+# Firebase Web (if using config file)
+web/firebase-config.js
+
+# Dart/Flutter-specific
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+build/
+
+ios/Flutter/Generated.xcconfig
+ios/Flutter/App.framework
+
+lib/firebase_options.dart
+firebase.json

@@ -19,11 +19,12 @@ class FamilyCubit extends Cubit<FamilyState> {
         .watchCurrentUser()
         .map((user) => user.kids ?? <String>[])
         .switchMap(
-          (kidId) =>
-              kidId.isEmpty
-                  ? Stream.value(<KidProfile>[])
-                  : _kidRepository.watchKid(kidId),
-        )
+          (kidId) {
+            emit(const FamilyState.loading());
+            return kidId.isEmpty
+                ? Stream.value(<KidProfile>[])
+                : _kidRepository.watchKid(kidId);
+          })
         .listen(
           (kidsList) => emit(FamilyState.success(kidsList)),
           onError: (e) => emit(FamilyState.failure(e.toString())),
