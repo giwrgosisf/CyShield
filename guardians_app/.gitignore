@@ -64,6 +64,7 @@ web/firebase-config.js
 .flutter-plugins-dependencies
 .packages
 .pub-cache/
+.pub/
 build/
 
 ios/Flutter/Generated.xcconfig
@@ -71,3 +72,6 @@ ios/Flutter/App.framework
 
 lib/firebase_options.dart
 firebase.json
+
+*.env
+*.key.json
