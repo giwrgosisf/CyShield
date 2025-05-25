@@ -41,4 +41,25 @@ router.post('/', async (req, res) => {
   }
 });
 
+
+router.post('/FcmRequest', async (req, res) => {
+  const { userId, title, body, data } = req.body;
+
+  if (!userId || !title || !body) {
+    return res.status(400).json({ error: 'Missing userId, title or body' });
+  }
+
+  try {
+    const fcmService = require('./fcmService');
+    await fcmService.notifyParent(userId, { title, body, data });
+    res.status(200).json({ status: 'Notification sent' });
+  } catch (error) {
+    console.error('Error sending FCM notification:', error);
+    res.status(500).json({ error: 'Failed to send notification' });
+  }
+});
+
+
+
+
 module.exports = router;

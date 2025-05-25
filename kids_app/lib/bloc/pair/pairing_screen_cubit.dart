@@ -97,7 +97,14 @@ class PairingScreenCubit extends Cubit<PairingScreenState>{
       parentId: parentId,
       kidProfile: _currentProfile!,
     );
+
+    await _pairingService.notifyParentOfPairing(
+        parentID: parentId,
+        kidName: _currentProfile!.firstName
+    );
   }
+
+
 
   Future<void> _waitForGuardianResponse(String parentId, String networkType) async {
 

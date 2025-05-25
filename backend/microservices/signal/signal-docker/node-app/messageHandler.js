@@ -2,7 +2,7 @@ import WebSocket from 'ws';
 import { getAllUsers } from './db.js';
 
 const SIGNAL_API = 'ws://signal-api:8080';
-const TARGET_ENDPOINT = 'http://192.168.1.79:8000/message';
+const TARGET_ENDPOINT = 'http://192.168.1.88:8000/message';
 
 
 // WebSocket is a protocol that provides full-duplex communication channels

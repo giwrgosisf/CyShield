@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:kids_app/core/services/backend_services.dart';
 
 import '../../data/models/kid_profile.dart';
 import '../../data/models/pairing_request.dart';
@@ -9,6 +10,8 @@ import '../../data/models/pairing_request.dart';
 class PairingService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final BackendServices server = BackendServices(baseUrl:'http://192.168.1.88');
+
 
 
   String get _uid => _auth.currentUser!.uid;
@@ -73,10 +76,15 @@ class PairingService {
   }
 
   Future<void> notifyParentOfPairing({
-    required String parentFcmToken,
+    required String parentID,
     required String kidName,
+    
   }) async {
-
+    server.notifyParent(
+        userId: parentID,
+        title: "New pairing request from $kidName",
+        body: "$kidName wants to add you as a guardian!"
+    );
   }
 
   Stream<String> watchPairingRequestStatus({

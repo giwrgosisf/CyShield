@@ -13,7 +13,7 @@ from zoneinfo import ZoneInfo
 
 CREDENTIALS_FILE = os.getenv("CREDENTIALS_FILE", "app/credentials/credentials.json")
 SESSIONS_DIR = os.getenv("SESSIONS_DIR", "app/sessions")
-TARGET_ENDPOINT = os.getenv("TARGET_ENDPOINT", "http://192.168.1.79:8000/message")
+TARGET_ENDPOINT = os.getenv("TARGET_ENDPOINT", "http://192.168.1.88:8000/message")
 credits_lock = asyncio.Lock()
 
 
