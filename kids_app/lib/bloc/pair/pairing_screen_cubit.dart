@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:ffi';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kids_app/bloc/pair/pairing_screen_state.dart';
+import 'package:kids_app/core/services/backend_services.dart';
 import '../../core/services/pairing_service.dart';
 import '../../data/models/kid_profile.dart';
 import '../../data/repositories/kid_repository.dart';
@@ -11,6 +13,7 @@ class PairingScreenCubit extends Cubit<PairingScreenState>{
   StreamSubscription<KidProfile>? _sub;
   StreamSubscription<String>? _pairingStatusSub;
   KidProfile? _currentProfile;
+  final BackendServices server = BackendServices(baseUrl:'http://192.168.1.88');
 
   PairingScreenCubit(
       this._kidRepository,
@@ -30,6 +33,16 @@ class PairingScreenCubit extends Cubit<PairingScreenState>{
       },
     );
   }
+
+ Future<bool> hasAlreadyInitializedTelegram(){
+    return server.getTelegramState();
+ }
+
+ Future<bool> hasAlreadyInitializedSignal(){
+    return server.getSignalState();
+ }
+
+
 
   Future<void> connectToGuardian({
     required String parentId,
@@ -57,10 +70,17 @@ class PairingScreenCubit extends Cubit<PairingScreenState>{
 
     try {
 
-      await _sendPairingRequest(parentId, networkType);
+      if (! await _pairingService.hasThisParentAlready(parentId: parentId)) {
+        await _sendPairingRequest(parentId, networkType);
+        await _waitForGuardianResponse(parentId, networkType);
+      }else{
+        emit(PairingScreenState.pairingSuccess(
+          profile: _currentProfile!,
+          message: 'Successfully connected to guardian!',
+        ));
 
+      }
 
-      await _waitForGuardianResponse(parentId, networkType);
 
     } on TimeoutException {
       emit(PairingScreenState.pairingTimeout(

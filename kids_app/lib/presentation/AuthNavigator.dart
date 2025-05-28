@@ -28,18 +28,23 @@ class AuthNavigator extends StatelessWidget {
 
         final user = snap.data;
 
-        if (user == null) {
-          return const LoginScreen();
+        // If user is NOT null, navigate to PairingScreen or your main app flow
+        if (user != null) {
+          // This ensures that even if the user logs in through Google
+          // and has their phone number, they land directly on PairingScreen.
+          // The LoginScreen's BlocListener will handle navigation to /pairing
+          // if phone number was required and then submitted.
+          return BlocProvider(
+            create: (context) => PairingScreenCubit(
+              context.read<KidRepository>(),
+              context.read<PairingService>(),
+            ),
+            child: const PairingScreen(),
+          );
         }
 
-        return BlocProvider(
-          create: (context) => PairingScreenCubit(
-            context.read<KidRepository>(),
-            context.read<PairingService>(),
-          ),
-          child: const PairingScreen(),
-        );
-
+        // If user is null, always show the LoginScreen
+        return const LoginScreen();
       },
     );
   }

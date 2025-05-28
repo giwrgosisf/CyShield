@@ -9,9 +9,13 @@ import 'package:kids_app/bloc/pair/pairing_screen_cubit.dart';
 import 'package:kids_app/data/repositories/auth_repository.dart';
 import 'package:kids_app/data/repositories/kid_repository.dart';
 import 'package:kids_app/presentation/AuthNavigator.dart';
+import 'package:kids_app/presentation/screens/all_done_screen.dart';
 import 'package:kids_app/presentation/screens/login_screen.dart';
 import 'package:kids_app/presentation/screens/pairing_screen.dart';
 import 'package:kids_app/presentation/screens/register_screen.dart';
+import 'package:kids_app/presentation/screens/signal_screen.dart';
+import 'package:kids_app/presentation/screens/telegram_code_verification.dart';
+import 'package:kids_app/presentation/screens/telegram_config_screen.dart';
 
 
 
@@ -96,16 +100,36 @@ class _CyShieldKidsAppState extends State<CyShieldKidsApp> {
               return MaterialPageRoute(builder: (_) => const LoginScreen());
             case '/pairing':
               return MaterialPageRoute(
-                builder:
-                    (_) => BlocProvider<PairingScreenCubit>(
-                      create:
-                          (ctx) => PairingScreenCubit(
-                            ctx.read<KidRepository>(),
-                            context.read<PairingService>(),
-                          ),
-                      child: const PairingScreen(),
-                    ),
+                builder: (_) => BlocProvider<PairingScreenCubit>(
+                  create: (ctx) => PairingScreenCubit(
+                    ctx.read<KidRepository>(),
+                    ctx.read<PairingService>(),
+                  ),
+                  child: const PairingScreen(),
+                ),
               );
+            case '/telegram_config':
+              return MaterialPageRoute(
+                builder: (context) => const TelegramConfigScreen(),
+                settings: settings,
+              );
+            case '/telegram_code_verification':
+              final args = settings.arguments;
+              return MaterialPageRoute(
+                builder: (context) => TelegramCodeVerificationScreen(
+                  arguments: args as Map<String, dynamic>,
+                ),
+                settings: settings,
+              );
+
+            case '/allDone':
+              return MaterialPageRoute(
+                builder: (context) => AllDoneScreen()
+              );
+            case '/signal':
+              return MaterialPageRoute(builder: (_) => SignalScreen());
+            default:
+              return null;
           }
         },
       ),

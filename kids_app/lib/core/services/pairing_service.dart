@@ -10,9 +10,9 @@ import '../../data/models/pairing_request.dart';
 class PairingService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final BackendServices server = BackendServices(baseUrl:'http://192.168.1.88');
-
-
+  final BackendServices server = BackendServices(
+    baseUrl: 'http://192.168.1.79',
+  );
 
   String get _uid => _auth.currentUser!.uid;
 
@@ -42,9 +42,7 @@ class PairingService {
           '${kidProfile.firstName} wants to connect with you as their guardian',
     };
 
-
     final batch = _db.batch();
-
 
     final guardianNotificationRef = _db
         .collection('users')
@@ -66,6 +64,29 @@ class PairingService {
   }
 
 
+
+
+  Future<void> addParentToKid({required String parentId, String? kidId}) async {
+    final childDoc = _db.collection('kids').doc(kidId ?? _uid);
+    await childDoc.update({
+      'parents': FieldValue.arrayUnion([parentId]),
+    });
+
+  }
+
+  Future<bool> hasThisParentAlready({
+    required String parentId,
+    String? kidId,
+  }) async {
+    final docRef = _db.collection('kids').doc(kidId ?? _uid);
+    final snap = await docRef.get();
+    if (!snap.exists) return false;
+
+    final data = snap.data()!;
+    final parents = List<String>.from(data['parents'] ?? <String>[]);
+    return parents.contains(parentId);
+  }
+
   Future<bool> doesGuardianExist(String parentId) async {
     try {
       final doc = await _db.collection('users').doc(parentId).get();
@@ -78,24 +99,21 @@ class PairingService {
   Future<void> notifyParentOfPairing({
     required String parentID,
     required String kidName,
-    
   }) async {
     server.notifyParent(
-        userId: parentID,
-        title: "New pairing request from $kidName",
-        body: "$kidName wants to add you as a guardian!"
+      userId: parentID,
+      title: "New pairing request from $kidName",
+      body: "$kidName wants to add you as a guardian!",
     );
   }
+
+
 
   Stream<String> watchPairingRequestStatus({
     required String parentId,
     required String kidId,
   }) {
-    return _db
-        .collection('users')
-        .doc(parentId)
-        .snapshots()
-        .map((snapshot) {
+    return _db.collection('users').doc(parentId).snapshots().map((snapshot) {
       if (!snapshot.exists) {
         return 'rejected';
       }
@@ -104,17 +122,17 @@ class PairingService {
       final pendingKids = List<String>.from(data['pendingKids'] ?? []);
       final acceptedKids = List<String>.from(data['kids'] ?? []);
 
-      if (acceptedKids.contains(kidId)) {
-        return 'accepted';
-      } else if (pendingKids.contains(kidId)) {
-        return 'pending';
-      } else {
-        return 'rejected';
-      }
+
+        if (acceptedKids.contains(kidId)) {
+          addParentToKid(parentId: parentId);
+          return 'accepted';
+        } else if (pendingKids.contains(kidId)) {
+          return 'pending';
+        } else {
+          return 'rejected';
+        }
     });
   }
-
-
 
   Future<bool> waitForPairingResponse({
     required String parentId,
@@ -137,9 +155,7 @@ class PairingService {
         completer.complete(false);
         subscription?.cancel();
       }
-
     });
-
 
     if (timeout != null) {
       Timer(timeout, () {
@@ -152,9 +168,4 @@ class PairingService {
 
     return completer.future;
   }
-
-
-
-
-
 }

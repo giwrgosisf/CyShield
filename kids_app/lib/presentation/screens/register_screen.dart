@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kids_app/bloc/register/register_event.dart';
+import 'package:kids_app/presentation/widgets/phone_number_input.dart';
 import '../../bloc/register/register_bloc.dart';
 import '../../bloc/register/register_event.dart';
 import '../../bloc/register/register_state.dart';
@@ -82,6 +83,18 @@ class RegisterScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 24),
                           ConfirmPasswordInput(),
+                          const SizedBox(height: 24),
+                          BlocBuilder<RegisterBloc, RegisterState>(
+                            buildWhen: (p, c) => p.phoneNumber != c.phoneNumber,
+                            builder:
+                                (context, state) => PhoneNumberInput(
+                              value: state.phoneNumber,
+                              onChanged:
+                                  (v) => context.read<RegisterBloc>().add(
+                                PhoneNumberRegisterChanged(v),
+                              ),
+                            ),
+                          ),
                           const SizedBox(height: 24),
                           RegisterButton(),
                         ],

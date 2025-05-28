@@ -60,7 +60,6 @@ class PairingFailureDialog extends StatelessWidget {
               child: OutlinedButton(
                 onPressed: () {
                   Navigator.of(context).pop();
-                  onCancel?.call();
                 },
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: Colors.grey),

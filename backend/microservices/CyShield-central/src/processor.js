@@ -7,6 +7,7 @@ const { logNotification } = require("./firestoreService");
 const { saveToxicMessage } = require("./firestoreService");
 const { notifyParent } = require("./fcmService");
 const { randomUUID } = require('crypto');
+const { findKidByPhoneNumber, findCoreSpondingParents } = require("./firestoreService");
 
 
 const WORKER_CONCURRENCY = 4;
@@ -31,25 +32,40 @@ function spawnProcessor(queueName) {
       const label = "toxic";
 
       if (label === "toxic") {
-        //await saveToxicMessage(user_id, text);
         
-        const id = randomUUID();
-        await logNotification(user_id, {
-          type: "new_report",
-          body: `Toxic message detected: "${
-            text.length > 50 ? text.slice(0, 47) + "…" : text
-          }"`,
-          metadata:{reportId: id},
-        });
 
-        await notifyParent(user_id, {
-          title: "Toxic Message Detected",
-          body: text.length > 100 ? text.slice(0, 97) + "…" : text,
-          data: {
+        const id = randomUUID();
+
+        kidId = await findKidByPhoneNumber(user_id);
+        if (!kidId) {
+          console.error(`No kid found for user_id: ${user_id}`);
+          return;
+        }
+
+        saveToxicMessage(kidId, text);
+        console.log(`Toxic message saved for kid ${kidId}:`, text);
+        const parents  = await findCoreSpondingParents(kidId);
+        console.log(`Found parents for kid ${kidId}:`, parents);
+
+        for (const parent of parents) {
+          await logNotification(parent, {
             type: "new_report",
-            reportId: id,
-          },
-        });
+            body: `Toxic message detected: "${text.length > 50 ? text.slice(0, 47) + "…" : text
+              }"`,
+            metadata: { reportId: id },
+          });
+
+
+          await notifyParent(parent, {
+            title: "Toxic Message Detected",
+            body: text.length > 100 ? text.slice(0, 97) + "…" : text,
+            data: {
+              type: "new_report",
+              reportId: id,
+            },
+          });
+
+        }
       }
       return { label };
     },

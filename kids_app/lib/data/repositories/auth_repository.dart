@@ -50,10 +50,27 @@ class AuthRepository {
         'email': user.email,
         'parents':<String>[],
         'createdAt': FieldValue.serverTimestamp(),
+        'telegram_state': false,
+        'signal_state': false,
+        'phone_number':''
       });
       await _saveFcmToken(user.uid);
     }
     return user;
+  }
+
+  Future<String?> getPhoneNumber(String uid) async {
+    final doc = await _firestore.collection('kids').doc(uid).get();
+    if (!doc.exists) return null;
+    final data = doc.data() as Map<String, dynamic>;
+    return data['phone_number'] as String?;
+  }
+
+  Future<void> savePhoneNumber(String uid, String phone) {
+    return _firestore
+        .collection('kids')
+        .doc(uid)
+        .update({'phone_number': phone});
   }
 
   Future<User?> signUpWithEmail({
@@ -62,6 +79,7 @@ class AuthRepository {
     required String name,
     required String surname,
     required DateTime birthDate,
+    required String phoneNumber
   }) async {
     final cred = await _firebaseAuth.createUserWithEmailAndPassword(
       email: email,
@@ -82,6 +100,9 @@ class AuthRepository {
         'parents':<String>[],
         'birthdate': Timestamp.fromDate(birthDate),
         'createdAt': FieldValue.serverTimestamp(),
+        'telegram_state': false,
+        'signal_state': false,
+        'phone_number': phoneNumber
       });
       await _saveFcmToken(user.uid);
     }

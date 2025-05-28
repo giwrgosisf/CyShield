@@ -22,3 +22,12 @@ class PasswordChanged extends LoginEvent {
 class LoginWithEmailPressed extends LoginEvent {}
 
 class LoginWithGooglePressed extends LoginEvent {}
+
+class PhoneNumberChanged extends LoginEvent {
+  final String phoneNumber;
+  PhoneNumberChanged(this.phoneNumber);
+  @override
+  List<Object?> get props => [phoneNumber];
+}
+
+class PhoneNumberSubmitted extends LoginEvent {}

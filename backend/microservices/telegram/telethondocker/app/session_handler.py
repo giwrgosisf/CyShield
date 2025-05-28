@@ -47,10 +47,18 @@ async def save_credentials(phone_number, api_id, api_hash):
 
 # This function checks if a session file exists for the given phone number.
 # If it exists, it means the phone number is already registered.
-async def is_registered_phone(phone_number):
-    """Check if a session file exists."""
-    session_path = f"{SESSIONS_DIR}/{phone_number}.session"
-    return os.path.exists(session_path)
+async def is_registered_phone(phone_number: str) -> bool:
+    """Check if the phone number exists in the credentials.json file."""
+    if not os.path.exists(CREDENTIALS_FILE):
+        return False
+
+    with open(CREDENTIALS_FILE, 'r') as f:
+        credentials = json.load(f)
+
+    for entry in credentials:
+        if entry.get("phone_number") == phone_number:
+            return True
+    return False
 
 
 # This function sends a verification code to the provided phone number using the Telethon library.

@@ -1,7 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kids_app/bloc/pair/pairing_screen_cubit.dart';
 import 'package:kids_app/bloc/pair/pairing_screen_state.dart';
+import 'package:kids_app/presentation/screens/signal_screen.dart';
+import 'package:kids_app/presentation/screens/telegram_config_screen.dart';
 import 'package:kids_app/presentation/widgets/custom_appbar.dart';
 import 'package:kids_app/presentation/widgets/pairing_form.dart';
 
@@ -9,9 +12,11 @@ import '../../core/app_theme.dart';
 import '../widgets/pairing_failure_dialog.dart';
 import '../widgets/pairing_dialog.dart';
 import '../widgets/pairing_succes_dialog.dart';
+import 'all_done_screen.dart';
 
 class PairingScreen extends StatefulWidget {
   const PairingScreen({super.key});
+
 
   @override
   State<PairingScreen> createState() => _PairingScreenState();
@@ -19,15 +24,47 @@ class PairingScreen extends StatefulWidget {
 
 class _PairingScreenState extends State<PairingScreen> {
   bool _isDialogShowing = false;
+  String? _selectedNetworkType;
+
+  void _navigateBasedOnNetwork() {
+    if (_selectedNetworkType == null) return;
+
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      switch (_selectedNetworkType!.toLowerCase()) {
+        case 'telegram':
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TelegramConfigScreen(),
+            ),
+          );
+          break;
+        case 'signal':
+        // Navigate to Signal screen
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SignalScreen(),
+            ),
+          );
+          break;
+        default:
+          Navigator.pushReplacementNamed(context, '/home');
+          break;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: 'Cyshield'),
+      appBar: CustomAppBar(title: 'Cyshield Kids'),
       body: SafeArea(
         child: BlocConsumer<PairingScreenCubit, PairingScreenState>(
           listenWhen: (prev, curr) {
-
             return prev.status != curr.status &&
                 (curr.status == PairingScreenStatus.failure ||
                     curr.status == PairingScreenStatus.pairingSuccess ||
@@ -37,7 +74,6 @@ class _PairingScreenState extends State<PairingScreen> {
                     curr.status == PairingScreenStatus.pairingPending);
           },
           listener: (context, state) {
-
             if (_isDialogShowing && Navigator.of(context).canPop()) {
               Navigator.of(context).pop();
               _isDialogShowing = false;
@@ -61,9 +97,33 @@ class _PairingScreenState extends State<PairingScreen> {
                 PairingSuccessDialog.show(
                   context,
                   message: state.successMessage ?? 'Successfully paired with guardian!',
-                  onContinue: () {
+                  onContinue: () async {
                     Navigator.of(context).pop();
                     _isDialogShowing = false;
+                    final cubit = context.read<PairingScreenCubit>();
+                    final bool telegram = await cubit.hasAlreadyInitializedTelegram();
+                    final bool signal =  await cubit.hasAlreadyInitializedSignal();
+                    final bool allDone = signal && telegram;
+                    if(allDone){
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => AllDoneScreen()),
+                      );
+                    }else if(_selectedNetworkType!.toLowerCase() == 'telegram' && telegram){
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => AllDoneScreen()),
+                      );
+                    }else if(_selectedNetworkType!.toLowerCase() == 'signal' && signal) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => AllDoneScreen()),
+                      );
+                    }else{
+                      _navigateBasedOnNetwork();
+                    }
+
                   },
                 );
                 break;
@@ -150,7 +210,13 @@ class _PairingScreenState extends State<PairingScreen> {
 
               case PairingScreenStatus.success:
                 final firstName = state.profile!.firstName;
-                return _Body(firstName: firstName, isFormEnabled: !_isDialogShowing);
+                return _Body(
+                  firstName: firstName,
+                  isFormEnabled: !_isDialogShowing,
+                  onNetworkSelected: (networkType) {
+                    _selectedNetworkType = networkType;
+                  },
+                );
 
               case PairingScreenStatus.pairingInProgress:
                 final firstName = state.profile?.firstName ?? '';
@@ -159,6 +225,9 @@ class _PairingScreenState extends State<PairingScreen> {
                   showLoading: true,
                   loadingMessage: 'Sending pairing request...',
                   isFormEnabled: false,
+                  onNetworkSelected: (networkType) {
+                    _selectedNetworkType = networkType;
+                  },
                 );
 
               case PairingScreenStatus.pairingPending:
@@ -169,15 +238,23 @@ class _PairingScreenState extends State<PairingScreen> {
                   loadingMessage: 'Waiting for guardian to accept...',
                   showCancelOption: true,
                   isFormEnabled: false,
+                  onNetworkSelected: (networkType) {
+                    _selectedNetworkType = networkType;
+                  },
                 );
 
               case PairingScreenStatus.pairingSuccess:
               case PairingScreenStatus.pairingFailure:
               case PairingScreenStatus.pairingRejected:
               case PairingScreenStatus.pairingTimeout:
-              // Keep showing the form while dialogs are displayed
                 final firstName = state.profile?.firstName ?? '';
-                return _Body(firstName: firstName, isFormEnabled: !_isDialogShowing);
+                return _Body(
+                  firstName: firstName,
+                  isFormEnabled: !_isDialogShowing,
+                  onNetworkSelected: (networkType) {
+                    _selectedNetworkType = networkType;
+                  },
+                );
             }
           },
         ),
@@ -192,6 +269,7 @@ class _Body extends StatelessWidget {
   final String? loadingMessage;
   final bool showCancelOption;
   final bool isFormEnabled;
+  final Function(String networkType)? onNetworkSelected;
 
   const _Body({
     required this.firstName,
@@ -199,6 +277,7 @@ class _Body extends StatelessWidget {
     this.loadingMessage,
     this.showCancelOption = false,
     this.isFormEnabled = true,
+    this.onNetworkSelected,
   });
 
   @override
@@ -230,6 +309,9 @@ class _Body extends StatelessWidget {
                 opacity: isFormEnabled ? 1.0 : 0.6,
                 child: PairingForm(
                   onSubmit: (parentId, network) {
+
+                    onNetworkSelected?.call(network);
+
                     context.read<PairingScreenCubit>().connectToGuardian(
                       parentId: parentId,
                       networkType: network,

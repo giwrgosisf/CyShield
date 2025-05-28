@@ -28,6 +28,9 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
     on<RegisterWithEmailPressed>(_registerWithEmailPressed);
   }
 
+
+
+
   Future<void> _registerWithEmailPressed(
       RegisterWithEmailPressed event,
       Emitter<RegisterState> emit,
@@ -50,6 +53,7 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
         email: state.email,
         password: state.password,
         birthDate: state.birthDate!,
+        phoneNumber: state.phoneNumber
       );
       if (user != null) {
         emit(state.copyWith(status: RegisterStatus.success));

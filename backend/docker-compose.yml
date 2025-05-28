@@ -113,7 +113,25 @@ services:
 
 
 volumes:
-      signal-data:
-      redis-data:
+  signal-data:
+  redis-data:
+
+#------------------------------------------
+# 7) Message Classifier Service
+#------------------------------------------
+  message-classifier:
+    build:
+      context: ./microservices/message-classifier
+      dockerfile: Dockerfile
+    container_name: message-classifier
+    ports:
+       - "9090:9090"
+    volumes:
+      - ./microservices/message-classifier:/app
+    environment:
+      - PYTHONPATH=/app
+    restart: unless-stopped
+
+
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------

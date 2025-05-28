@@ -5,7 +5,12 @@ import '../../../bloc/login/login_event.dart';
 import '../../../core/app_theme.dart';
 
 class GoogleLoginButton extends StatelessWidget {
-  const GoogleLoginButton({super.key});
+  final VoidCallback? onPressed;
+
+  const GoogleLoginButton({
+    super.key,
+    required this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +25,7 @@ class GoogleLoginButton extends StatelessWidget {
       ),
       icon: Image.asset('assets/google_logo.png', height: 24),
       label: Text('Σύνδεση μέσω Google', style: TextStyle(color: Colors.black)),
-      onPressed: () => context.read<LoginBloc>().add(LoginWithGooglePressed()),
+      onPressed: onPressed,
     );
   }
 }

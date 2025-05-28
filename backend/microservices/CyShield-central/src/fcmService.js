@@ -3,7 +3,7 @@ const admin = require('./firebaseAdmin');
 const db    = admin.firestore();
 
 async function notifyParent(userId, { title, body, data = {}}) {
-  const userRef = db.collection('users').doc('8Ih04XZWFccmtDSajCqXbRh16tn2');
+  const userRef = db.collection('users').doc(userId);
   const userDoc = await userRef.get();
 
   if (!userDoc.exists) {

@@ -11,6 +11,7 @@ class RegisterState extends Equatable {
   final String confirmPassword;
   final RegisterStatus status;
   final String? errorMessage;
+  final String phoneNumber;
 
   const RegisterState({
     this.name = '',
@@ -19,6 +20,7 @@ class RegisterState extends Equatable {
     this.email = '',
     this.password = '',
     this.confirmPassword = '',
+    this.phoneNumber= '',
     this.status = RegisterStatus.initial,
     this.errorMessage,
   });
@@ -38,6 +40,7 @@ class RegisterState extends Equatable {
     String? email,
     String? password,
     String? confirmPassword,
+    String? phoneNumber,
     RegisterStatus? status,
     String? errorMessage,
   }) {
@@ -48,6 +51,7 @@ class RegisterState extends Equatable {
       email: email ?? this.email,
       password: password ?? this.password,
       confirmPassword: confirmPassword ?? this.confirmPassword,
+      phoneNumber: phoneNumber ?? this.phoneNumber ,
       status: status ?? this.status,
       errorMessage: errorMessage,
     );
@@ -63,5 +67,6 @@ class RegisterState extends Equatable {
     confirmPassword,
     status,
     errorMessage,
+    phoneNumber
   ];
 }

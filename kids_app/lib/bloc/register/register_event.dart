@@ -61,5 +61,14 @@ class PasswordRegisterChanged extends RegisterEvent {
   List<Object?> get props => [password];
 }
 
+class PhoneNumberRegisterChanged extends RegisterEvent {
+  final String phone;
+  PhoneNumberRegisterChanged(this.phone);
+  @override
+  List<Object?> get props => [phone];
+}
+
+
+
 
 class RegisterWithEmailPressed extends RegisterEvent {}
