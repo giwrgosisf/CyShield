@@ -34,4 +34,15 @@ class KidProfile {
       KidProfile.fromMap(doc.id, doc.data()!, flaggedMessages: flaggedMessages);
 
   double get totalMessages => flaggedMessages.length.toDouble();
+
+  KidProfile copyWith({ List<MessageModel>? flaggedMessages }) {
+    return KidProfile(
+      id: id,
+      firstName: firstName,
+      photoURL: photoURL,
+      flaggedMessages: flaggedMessages ?? this.flaggedMessages,
+    );
+  }
+
+
 }
