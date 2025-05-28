@@ -32,7 +32,7 @@ class BackendServices {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.88:7000/send-code'),
+        Uri.parse('http://telegram.cyshield.org/send-code'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(requestBody),
       );
@@ -120,15 +120,11 @@ class BackendServices {
     };
 
     // Debug: Print request details
-    if (kDebugMode) {
-      print('=== CONFIRM CODE REQUEST ===');
-      print('URL: http://192.168.1.88:7000/login');
-      print('Request Body: ${jsonEncode(requestBody)}');
-    }
+
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.88:7000/login'),
+        Uri.parse('http://telegram.cyshield.org/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(requestBody),
       );
@@ -206,7 +202,7 @@ class BackendServices {
     required String body,
     Map<String, String>? data,
   }) async {
-    final url = Uri.parse('$baseUrl:8000/message/FcmRequest');
+    final url = Uri.parse('http://central.cyshield.org/message/FcmRequest');
 
     final payload = {
       'userId': userId,
