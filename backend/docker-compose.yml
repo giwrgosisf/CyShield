@@ -112,9 +112,7 @@ services:
     restart: unless-stopped
 
 
-volumes:
-  signal-data:
-  redis-data:
+
 
 #------------------------------------------
 # 7) Message Classifier Service
@@ -132,6 +130,8 @@ volumes:
       - PYTHONPATH=/app
     restart: unless-stopped
 
-
+volumes:
+  signal-data:
+  redis-data:
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------

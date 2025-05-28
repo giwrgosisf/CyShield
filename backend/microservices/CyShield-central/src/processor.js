@@ -12,6 +12,8 @@ const { findKidByPhoneNumber, findCoreSpondingParents } = require("./firestoreSe
 
 const WORKER_CONCURRENCY = 4;
 
+const ML_SERVICE_URL = 'http://192.168.1.79:9090/classify';
+
 const connection = new IORedis({
   host: process.env.REDIS_HOST || "redis",
   port: process.env.REDIS_PORT || 6379,
@@ -23,51 +25,59 @@ function spawnProcessor(queueName) {
     queueName,
     async (job) => {
       const { text, user_id } = job.data;
+      let processedLabel = "unknown"; 
 
-      // TODO: replace with your real ML call
-      // const { data: { label } } = await axios.post(
-      //   process.env.MODEL_API_URL,
-      //   { text },
-      // );
-      const label = "toxic";
-
-      if (label === "toxic") {
-        
-
-        const id = randomUUID();
-
-        kidId = await findKidByPhoneNumber(user_id);
-        if (!kidId) {
-          console.error(`No kid found for user_id: ${user_id}`);
-          return;
-        }
-
-        saveToxicMessage(kidId, text);
-        console.log(`Toxic message saved for kid ${kidId}:`, text);
-        const parents  = await findCoreSpondingParents(kidId);
-        console.log(`Found parents for kid ${kidId}:`, parents);
-
-        for (const parent of parents) {
-          await logNotification(parent, {
-            type: "new_report",
-            body: `Toxic message detected: "${text.length > 50 ? text.slice(0, 47) + "…" : text
-              }"`,
-            metadata: { reportId: id },
+      try {
+        const label = await axios
+          .post(ML_SERVICE_URL, { text })
+          .then((response) => response.data.label)
+          .catch((error) => {
+            console.error(`Error calling ML service: ${error.message}`);
+            return "unknown";
           });
+        console.log(`Received label "${label}" for text: "${text}"`);
+        processedLabel = label; 
 
+        if (label === "toxic") {
+          const id = randomUUID();
 
-          await notifyParent(parent, {
-            title: "Toxic Message Detected",
-            body: text.length > 100 ? text.slice(0, 97) + "…" : text,
-            data: {
+          const kidId = await findKidByPhoneNumber(user_id); 
+          if (!kidId) {
+            console.error(`No kid found for user_id: ${user_id}`);
+            return { label: processedLabel }; 
+          }
+
+          saveToxicMessage(kidId, text);
+          console.log(`Toxic message saved for kid ${kidId}:`, text);
+          const parents  = await findCoreSpondingParents(kidId);
+          console.log(`Found parents for kid ${kidId}:`, parents);
+
+          for (const parent of parents) {
+            await logNotification(parent, {
               type: "new_report",
-              reportId: id,
-            },
-          });
+              body: `Toxic message detected: "${text.length > 50 ? text.slice(0, 47) + "…" : text
+                }"`,
+              metadata: { reportId: id },
+            });
 
+
+            await notifyParent(parent, {
+              title: "Toxic Message Detected",
+              body: text.length > 100 ? text.slice(0, 97) + "…" : text,
+              data: {
+                type: "new_report",
+                reportId: id,
+              },
+            });
+
+          }
         }
+
+        return { label: processedLabel }; 
+      } catch (error) {
+        console.error('Processing error:', error);
+        return { label: processedLabel }; 
       }
-      return { label };
     },
     {
       connection,
