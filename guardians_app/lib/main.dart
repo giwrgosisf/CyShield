@@ -18,6 +18,7 @@ import 'bloc/family/family_cubit.dart';
 import 'bloc/home/home_cubit.dart';
 import 'bloc/notifications/notifications_cubit.dart';
 import 'bloc/profile/profile_cubit.dart';
+import 'bloc/reports/reports_bloc.dart';
 import 'core/services/notification_service.dart';
 import 'firebase_options.dart';
 
@@ -79,13 +80,13 @@ class _CyshieldGuardiansAppState extends State<CyShieldGuardiansApp> {
         RepositoryProvider<AuthRepository>(
           create: (_) => AuthRepository(firestore: FirebaseFirestore.instance),
         ),
+        RepositoryProvider<KidRepository>(create: (_) => KidRepository()),
         RepositoryProvider<ReportsRepository>(
-          create: (_) => ReportsRepository(),
+          create: (_) => ReportsRepository(context.read<KidRepository>()),
         ),
         RepositoryProvider<UserRepository>(
           create: (_) => FirebaseUserRepository(),
         ),
-        RepositoryProvider<KidRepository>(create: (_) => KidRepository()),
         RepositoryProvider<NotificationRepository>(
           create: (_) => NotificationRepository(),
         ),
@@ -118,7 +119,13 @@ class _CyshieldGuardiansAppState extends State<CyShieldGuardiansApp> {
             case '/login':
               return MaterialPageRoute(builder: (_) => const LoginScreen());
             case '/reports':
-              return MaterialPageRoute(builder: (_) => ReportsScreen());
+              return MaterialPageRoute(
+                builder: (_) => BlocProvider<ReportsBloc>(
+                  create: (ctx) => ReportsBloc(ctx.read<ReportsRepository>()),
+                  child: const ReportsScreen(),
+                ),
+                settings: settings, // Important: pass the settings to preserve arguments
+              );
             case '/statistics':
               return MaterialPageRoute(builder: (_) => StatisticsScreen());
             case '/notifications':
