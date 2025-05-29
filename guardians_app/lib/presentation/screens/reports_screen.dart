@@ -1,151 +1,151 @@
-
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guardians_app/presentation/screens/statistics_screen.dart';
 
 import '../../bloc/reports/reports_bloc.dart';
+import '../../bloc/reports/reports_event.dart';
 import '../../bloc/reports/reports_state.dart';
 import '../../bloc/statistics/statistics_bloc.dart';
 import '../../bloc/statistics/statistics_event.dart';
 import '../../core/app_theme.dart';
 import '../../core/containers/strings.dart';
 import '../../data/repositories/reports_repository.dart';
-import '../../models/child_model.dart';
+import '../../data/models/kid_profile.dart';
+import '../widgets/custom_appbar.dart';
 import '../widgets/message_card.dart';
 
-class ReportsScreen extends StatelessWidget {
-  ReportsScreen({super.key});
+class ReportsScreen extends StatefulWidget {
+  const ReportsScreen({Key? key}) : super(key: key);
 
-  final reportsRepository = ReportsRepository();
+  @override
+  State<ReportsScreen> createState() => _ReportsScreenState();
+}
+
+class _ReportsScreenState extends State<ReportsScreen> {
+  List<String> kidIds = [];
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // Extract arguments passed from navigation
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    if (args != null && args['kidIds'] != null) {
+      kidIds = List<String>.from(args['kidIds']);
+
+      // Trigger loading reports when we first get the kidIds
+      if (kidIds.isNotEmpty) {
+        context.read<ReportsBloc>().add(LoadReports(kidIds));
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      //create: (_) => ReportsBloc(reportsRepository)..add(LoadReports()),
-      create: (_) => ReportsBloc(context.read<ReportsRepository>()),
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: AppTheme.secondary,
-          actions: [
-            PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert, color: Colors.white),
-              onSelected: (value) {},
-              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                const PopupMenuItem<String>(
-                  value: 'settings',
-                  child: Text('Settings'),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'help',
-                  child: Text('Help'),
-                ),
-              ],
-            ),
-          ],
-          elevation: 10,
-          shadowColor: Colors.black.withAlpha((255).round()),
-          title: Text(
-            MyText.appTitle,
-            style: TextStyle(
-              color: Colors.white,
-              fontFamily: 'ArbutusSlab',
-              fontSize: 30,
-              letterSpacing: 1,
-            ),
-          ),
-          centerTitle: true,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(12)),
-          ),
-        ),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 220,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black26,
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+    return Scaffold(
+      appBar: const CustomAppBar(title: 'Cyshield'),
+      body: SafeArea(
+        child: BlocBuilder<ReportsBloc, ReportsState>(
+          builder: (context, state) {
+            if (state is ReportsInitial || state is ReportsLoading) {
+              return const Center(
+                child: CircularProgressIndicator(color: AppTheme.primary),
+              );
+            }
+
+            if (state is ReportsError) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 16),
+                    Text(
+                      'Σφάλμα φόρτωσης αναφορών',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w500,
                       ),
-                      child: const Center(
-                        child: Text(
-                          MyText.reports,
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      state.message,
+                      style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: () {
+                        context.read<ReportsBloc>().add(LoadReports(kidIds));
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.secondary,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: const Text('Δοκιμάστε ξανά'),
+                    ),
+                  ],
+                ),
+              );
+            }
+            if (state is ReportsLoaded) {
+              final kidsWithFlags = state.kidsWithFlaggedMessages;
+
+              if (kidsWithFlags.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.shield_outlined,
+                        size: 64,
+                        color: Colors.green[400],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Δεν υπάρχουν αναφορές',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                    ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Όλα τα παιδιά σας είναι ασφαλή!',
+                        style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                      ),
+                    ],
                   ),
-                  Positioned(
-                    left: 0,
-                    top: 0,
-                    bottom: 0,
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.black),
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          CupertinoPageRoute(
-                            builder: (context) => BlocProvider(
-                              create: (context) => StatisticsBloc(reportsRepository)..add(LoadStatistics()),
-                              child: StatisticsScreen(),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 15),
-            Expanded(
-              child: BlocBuilder<ReportsBloc, ReportsState>(
-                builder: (context, state) {
-                  if (state is ReportsLoading) {
-                    return const Center(child: CircularProgressIndicator(color: AppTheme.primary));
-                  } else if (state is ReportsLoaded) {
-                    return ListView.builder(
-                      itemCount: state.children.length,
-                      itemBuilder: (context, index) {
-                        final child = state.children[index];
-                        return _buildChildReports(child);
-                      },
-                    );
-                  } else if (state is ReportsError) {
-                    return Center(child: Text(state.message));
-                  }
-                  return Container();
+                );
+              }
+
+              return RefreshIndicator(
+                color: AppTheme.secondary,
+                onRefresh: () async {
+                  context.read<ReportsBloc>().add(const RefreshReports());
                 },
-              ),
-            ),
-          ],
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: kidsWithFlags.length,
+                  itemBuilder: (context, index) {
+                    final kid = kidsWithFlags[index];
+                    return _buildChildReports(context, kid);
+                  },
+                ),
+              );
+            }
+
+            return const SizedBox();
+          },
         ),
       ),
     );
   }
 
-  Widget _buildChildReports(ChildModel child) {
+  Widget _buildChildReports(BuildContext context, KidProfile child) {
     return Padding(
       padding: const EdgeInsets.only(top: 50, left: 20, right: 20, bottom: 36),
       child: Stack(
@@ -162,7 +162,7 @@ class ReportsScreen extends StatelessWidget {
               children: [
                 Center(
                   child: Text(
-                    child.name,
+                    child.firstName,
                     style: const TextStyle(fontSize: 30, color: Colors.white),
                   ),
                 ),
@@ -173,7 +173,27 @@ class ReportsScreen extends StatelessWidget {
                   itemCount: child.flaggedMessages.length,
                   itemBuilder: (context, index) {
                     final message = child.flaggedMessages[index];
-                    return MessageCard(message: message);
+                    return MessageCard(
+                      message: message,
+                      onYesPressed: () {
+                        context.read<ReportsBloc>().add(
+                          MarkMessageAsReviewed(
+                            kidId: message.childId,
+                            messageId: message.messageId,
+                            isOffensive: true,
+                          ),
+                        );
+                      },
+                      onNoPressed: () {
+                        context.read<ReportsBloc>().add(
+                          MarkMessageAsReviewed(
+                            kidId: message.childId,
+                            messageId: message.messageId,
+                            isOffensive: false,
+                          ),
+                        );
+                      },
+                    );
                   },
                 ),
               ],
@@ -183,16 +203,48 @@ class ReportsScreen extends StatelessWidget {
             top: -60,
             left: -25,
             child: ClipOval(
-              child: Image.asset(
-                child.avatar,
-                width: 150,
-                height: 150,
-                fit: BoxFit.cover,
-              ),
+              child:
+                  child.photoURL != null
+                      ? Image.network(
+                        child.photoURL!,
+                        width: 150,
+                        height: 150,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return _buildDefaultAvatar(child.firstName);
+                        },
+                      )
+                      : Image.asset(
+                        'assets/images/austin.png',
+                        width: 150,
+                        height: 150,
+                        fit: BoxFit.cover,
+                      ),
             ),
           ),
         ],
       ),
     );
   }
+}
+
+Widget _buildDefaultAvatar(String name) {
+  return Container(
+    width: 150,
+    height: 150,
+    decoration: BoxDecoration(
+      color: AppTheme.primary.withOpacity(0.7),
+      shape: BoxShape.circle,
+    ),
+    child: Center(
+      child: Text(
+        name.isNotEmpty ? name[0].toUpperCase() : '?',
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 60,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    ),
+  );
 }

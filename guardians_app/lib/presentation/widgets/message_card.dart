@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:guardians_app/core/app_theme.dart';
 import 'package:guardians_app/core/containers/strings.dart';
-import '../../models/message_model.dart';
+import 'package:intl/intl.dart';
+import '../../data/models/message_model.dart';
+
 
 class MessageCard extends StatelessWidget {
   final MessageModel message;
+  final VoidCallback? onYesPressed;
+  final VoidCallback? onNoPressed;
 
-  const MessageCard({super.key, required this.message});
+  const MessageCard({
+    super.key,
+    required this.message,
+    this.onYesPressed, this.onNoPressed});
 
   Color getBackgroundColor(double probability) {
     if (probability >= 0.9) return AppTheme.slightlyRed;
-    if (probability >= 0.6) return AppTheme.slightlyYellow;
+    if (probability >= 0.5) return AppTheme.slightlyYellow;
     return Colors.green.shade300;
   }
 
@@ -89,7 +96,7 @@ class MessageCard extends StatelessWidget {
                         bottom: 0,
                         right: 0,
                         child: Text(
-                          message.time,
+                          DateFormat('HH:mm').format(message.time),
                           style: const TextStyle(
                             fontSize: 12,
                             color: Colors.white,
@@ -121,7 +128,7 @@ class MessageCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ElevatedButton(
-                onPressed: () {},
+                onPressed: onYesPressed,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   foregroundColor: Colors.white,
@@ -131,7 +138,7 @@ class MessageCard extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: onNoPressed ,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   foregroundColor: Colors.white,

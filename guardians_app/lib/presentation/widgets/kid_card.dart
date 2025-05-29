@@ -21,7 +21,7 @@ class KidCard extends StatelessWidget {
           backgroundImage:
               kid.photoURL != null
                   ? NetworkImage(kid.photoURL!)
-                  : const AssetImage('assets/images/austin.png"')
+                  : const AssetImage('assets/images/austin.png')
                       as ImageProvider,
         ),
         Positioned(

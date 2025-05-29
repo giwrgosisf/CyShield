@@ -50,7 +50,8 @@ class HomeScreen extends StatelessWidget {
 
               case HomeStatus.success:
                 final firstName = state.profile!.firstName;
-                return _Body(firstName: firstName);
+                final kidIds = state.profile!.kids ?? [];
+                return _Body(firstName: firstName, kidIds: kidIds);
             }
           },
         ),
@@ -71,8 +72,9 @@ class HomeScreen extends StatelessWidget {
 
 class _Body extends StatelessWidget {
   final String firstName;
+  final List<String> kidIds;
 
-  const _Body({required this.firstName});
+  const _Body({required this.firstName, required this.kidIds});
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +103,11 @@ class _Body extends StatelessWidget {
               asset: 'assets/images/home_reports.png',
               label: 'Αναφορές',
               onTap: () {
-                Navigator.pushNamed(context, '/reports');
+                Navigator.pushNamed(
+                  context,
+                  '/reports',
+                  arguments: {'kidIds': kidIds},
+                );
               },
             ),
             const SizedBox(height: 60),

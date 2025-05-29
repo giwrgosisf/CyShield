@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 
 class MyText {
   static String appTitle = ("CyShield");
-  static const String reports = ("Ααναφορές");
+  static const String reports = ("Αναφορές");
   static String harmfulText = ("Ήταν αυτό το μήνυμα προσβλητικό;");
   static Text yes = Text("Ναι");
   static Text no = Text("Όχι");
