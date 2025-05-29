@@ -54,8 +54,8 @@ class KidRepository {
     final flaggedMessages = _db
         .collection('kids')
         .doc(kidId)
-        .collection('flaggedMessages')
-        .orderBy('time', descending: true)
+        .collection('flaggedmessages')
+        .orderBy('timestamp', descending: true)
         .snapshots()
         .handleError((e, st) {
           print('Error loading flagged messages for $kidId: $e');
@@ -84,11 +84,11 @@ class KidRepository {
               return MessageModel(
                 childId: kidId,
                 messageId: d.id,
-                senderName: data['senderName'] as String? ?? 'Unknown',
+                senderName: data['sender'] as String? ?? 'Unknown',
                 text: data['text'] as String? ?? '',
-                probability: (data['probability'] as num?)?.toDouble() ?? 0.0,
-                time: data['time'] != null
-                    ? (data['time'] as Timestamp).toDate()
+                probability: (data['score'] as num?)?.toDouble() ?? 0.0,
+                time: data['timestamp'] != null
+                    ? (data['timestamp'] as Timestamp).toDate()
                     : DateTime.now(),
                 childName: childName,
               );

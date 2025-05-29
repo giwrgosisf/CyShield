@@ -21,10 +21,12 @@ class MessageModel{
     return MessageModel(
       childId: map['childId'] as String,
       messageId: map['messageId'] as String,
-      senderName: map['senderName'] as String? ?? 'Unknown',
+      senderName: (map['sender'] ?? map['senderName']) as String? ?? 'Unknown',
       text: map['text'] as String? ?? '',
-      probability: (map['probability'] as num?)?.toDouble() ?? 0.0,
-      time: (map['time'] as Timestamp).toDate(),
+      probability: ((map['score'] ?? map['probability']) as num?)?.toDouble() ?? 0.0,
+      time: (map['timestamp'] ?? map['time']) != null
+          ? ((map['timestamp'] ?? map['time']) as Timestamp).toDate()
+          : DateTime.now(),
       childName: map['childName'] as String? ?? '',
     );
   }
@@ -32,10 +34,10 @@ class MessageModel{
   Map<String, dynamic> toMap() => {
     'childId': childId,
     'messageId': messageId,
-    'senderName': senderName,
+    'sender': senderName,
     'text': text,
-    'probability': probability,
-    'time': Timestamp.fromDate(time),
+    'score': probability,
+    'timestamp': Timestamp.fromDate(time),
     'childName': childName,
   };
 }
