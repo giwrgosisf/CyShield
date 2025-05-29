@@ -81,9 +81,7 @@ class _CyshieldGuardiansAppState extends State<CyShieldGuardiansApp> {
           create: (_) => AuthRepository(firestore: FirebaseFirestore.instance),
         ),
         RepositoryProvider<KidRepository>(create: (_) => KidRepository()),
-        RepositoryProvider<ReportsRepository>(
-          create: (_) => ReportsRepository(context.read<KidRepository>()),
-        ),
+
         RepositoryProvider<UserRepository>(
           create: (_) => FirebaseUserRepository(),
         ),
@@ -120,14 +118,18 @@ class _CyshieldGuardiansAppState extends State<CyShieldGuardiansApp> {
               return MaterialPageRoute(builder: (_) => const LoginScreen());
             case '/reports':
               return MaterialPageRoute(
-                builder: (_) => BlocProvider<ReportsBloc>(
-                  create: (ctx) => ReportsBloc(ctx.read<ReportsRepository>()),
-                  child: const ReportsScreen(),
+                builder: (_) => RepositoryProvider<ReportsRepository>(
+                  // Create ReportsRepository here where KidRepository is available
+                  create: (ctx) => ReportsRepository(ctx.read<KidRepository>()),
+                  child: BlocProvider<ReportsBloc>(
+                    create: (ctx) => ReportsBloc(ctx.read<ReportsRepository>()),
+                    child: const ReportsScreen(),
+                  ),
                 ),
-                settings: settings, // Important: pass the settings to preserve arguments
+                settings: settings,
               );
-            case '/statistics':
-              return MaterialPageRoute(builder: (_) => StatisticsScreen());
+            // case '/statistics':
+            //   return MaterialPageRoute(builder: (_) => StatisticsScreen());
             case '/notifications':
               return MaterialPageRoute(
                 builder: (_) => BlocProvider(
