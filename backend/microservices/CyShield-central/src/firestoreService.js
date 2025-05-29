@@ -43,11 +43,66 @@ async function logNotification(userId, { type, body, metadata = {} }) {
   });
 }
 
-async function saveToxicMessage(user_id, text) {
+async function raiseModerateCaounter(userId) {
+  const userRef = db.collection('kids').doc(userId);
+  const userDoc = await userRef.get();
+  
+  if (!userDoc.exists) {
+    console.error(`User with ID ${userId} does not exist.`);
+    return;
+  }
+  
+  const currentCount = userDoc.data().moderate || 0;
+  await userRef.update({
+    moderate: currentCount + 1,
+    
+  });
+  
+}
+
+async function raiseToxicCaounter(userId) {
+  const userRef = db.collection('kids').doc(userId);
+  const userDoc = await userRef.get();
+  
+  if (!userDoc.exists) {
+    console.error(`User with ID ${userId} does not exist.`);
+    return;
+  }
+  
+  const currentCount = userDoc.data().toxic || 0;
+  await userRef.update({
+    toxic: currentCount + 1,
+    
+  });
+  
+}
+
+
+
+async function raiseHealthyCaounter(userId) {
+  const userRef = db.collection('kids').doc(userId);
+  const userDoc = await userRef.get();
+  
+  if (!userDoc.exists) {
+    console.error(`User with ID ${userId} does not exist.`);
+    return;
+  }
+  
+  const currentCount = userDoc.data().healthy || 0;
+  await userRef.update({
+    healthy: currentCount + 1,
+    
+  });
+  
+}
+
+async function saveToxicMessage(user_id, text , score , sender) {
   const toxicMessageRef = db.collection('kids').doc(user_id).collection('flaggedmessages').doc();
   await toxicMessageRef.set({
     text,
-    timestamp: admin.firestore.FieldValue.serverTimestamp()
+    timestamp: admin.firestore.FieldValue.serverTimestamp(),
+    score: score, 
+    sender: sender
   });
   
 }
@@ -58,5 +113,8 @@ module.exports = {
   logNotification,
   findKidByPhoneNumber,
   findCoreSpondingParents,
-  saveToxicMessage
+  saveToxicMessage,
+  raiseModerateCaounter,
+  raiseToxicCaounter,
+  raiseHealthyCaounter
 };

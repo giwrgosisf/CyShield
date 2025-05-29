@@ -117,21 +117,31 @@ services:
 #------------------------------------------
 # 7) Message Classifier Service
 #------------------------------------------
-  message-classifier:
-    build:
-      context: ./microservices/message-classifier
-      dockerfile: Dockerfile
-    container_name: message-classifier
-    ports:
-       - "9090:9090"
-    volumes:
-      - ./microservices/message-classifier:/app
+  ml-service:
+    build: 
+      context: .
+      dockerfile:  microservices/message_classifier/Dockerfile
     environment:
-      - PYTHONPATH=/app
-    restart: unless-stopped
+      MAX_WORKERS: 4  
+      BATCH_SIZE: 32 
+      CUDA_VISIBLE_DEVICES: 0  
+      PYTORCH_CUDA_ALLOC_CONF: max_split_size_mb:128
+    deploy:
+      replicas: 1      
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+   
 
 volumes:
   signal-data:
   redis-data:
+
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------

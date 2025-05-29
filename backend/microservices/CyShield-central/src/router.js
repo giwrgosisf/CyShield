@@ -25,10 +25,10 @@ router.post('/', async (req, res) => {
     
     
     if (platform === 'Telegram') {
-      await telegramQueue.add('classify', { text, user_id });
+      await telegramQueue.add('classify', { text, user_id ,sender });
     }
     else if (platform === 'signal') {
-      await signalQueue.add('classify', { text, user_id });
+      await signalQueue.add('classify', { text, user_id , sender });
     } else {
       console.error('Unsupported platform:', platform);
       return res.status(400).json({ error: 'Unsupported platform' });

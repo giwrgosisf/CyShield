@@ -2,6 +2,7 @@ import os
 import json
 import asyncio
 import logging
+import traceback
 from typing import List, Dict, Any
 from concurrent.futures import ThreadPoolExecutor
 import torch
@@ -13,12 +14,15 @@ import uvicorn
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 class MessageRequest(BaseModel):
     message: str
     message_id: str = None
 
+
 class BatchMessageRequest(BaseModel):
     messages: List[MessageRequest]
+
 
 class PredictionResponse(BaseModel):
     message_id: str = None
@@ -27,35 +31,39 @@ class PredictionResponse(BaseModel):
     confidence: float
     label: str
 
+
 class BatchPredictionResponse(BaseModel):
     predictions: List[PredictionResponse]
 
+
 class BullyingClassifier:
-    def __init__(self, model_path: str = "./greek_bert_cyberbullying", max_length: int = 256, batch_size: int = 8):
+    def __init__(self, model_path: str = "greek_bert_cyberbullying", max_length: int = 256, batch_size: int = 8):
         self.model_path = model_path
         self.max_length = max_length
         self.batch_size = int(os.getenv("BATCH_SIZE", batch_size))
-        self.device = self._setup_device()
+        self.device = self._set_device()
         self.model = None
         self.tokenizer = None
         self.load_model()
 
     def _set_device(self):
-        if not torch.cuda.is_availiable():
-            logger.warning("CUDA NOT AVAILABLE !!!!!!!!!!!!!! USING CPU !!!!!!!!!! ")
+        if not torch.cuda.is_available():
+            logger.warning(
+                "CUDA NOT AVAILABLE !!!!!!!!!!!!!! USING CPU !!!!!!!!!! ")
             return torch.device("cpu")
 
         device_id = int(os.getenv("CUDA_VISIBLE_DEVICES", "0"))
-        if device_id >= torch.cuda.device.count():
-            logger.warning(f"CUDA device {device_id} not available, using device 0")
+        if device_id >= torch.cuda.device_count():
+            logger.warning(
+                f"CUDA device {device_id} not available, using device 0")
             device_id = 0
 
         device = torch.device(f"cuda:{device_id}")
 
-        torch.cuda.set_per_process_memory_fraction(0.8, device_id)  # Use 80% of GPU memory
+        torch.cuda.set_per_process_memory_fraction(
+            0.8, device_id)  # Use 80% of GPU memory
 
         return device
-
 
     def load_model(self):
         try:
@@ -64,12 +72,11 @@ class BullyingClassifier:
             self.model = AutoModelForSequenceClassification.from_pretrained(
                 self.model_path,
                 torch_dtype=torch.float16 if self.device.type == "cuda" else torch.float32,
-                device_map="auto" if self.device.type == "cuda" else None
             )
 
             if self.device.type == "cuda":
                 self.model = self.model.to(self.device)
-                self.model = torch.compile(self.model, mode="reduce-overhead")
+                #self.model = torch.compile(self.model, mode="reduce-overhead")
 
             self.model.eval()
 
@@ -81,18 +88,18 @@ class BullyingClassifier:
             logger.error(f"Error loading model: {e}")
             raise e
 
-
     def _warmup_model(self):
         try:
             dummy = 'This is an example to warm up the model'
             dummy_input = self.tokenizer(dummy,
-                                         trunication = True,
-                                         padding = True,
-                                         max_length = self.max_length,
-                                         return_tensors = "pt")
+                             truncation=True,
+                             padding=True,
+                             max_length=self.max_length,
+                             return_tensors="pt")
 
             # move to cuda
-            dummy_input = {key: value.to(self.device) for key, value in dummy_input.items()}
+            dummy_input = {key: value.to(self.device)
+                           for key, value in dummy_input.items()}
 
             with torch.no_grad():
                 _ = self.model(**dummy_input)
@@ -103,7 +110,6 @@ class BullyingClassifier:
             logger.info("Model warmup completed")
         except Exception as e:
             logger.warning(f"Model warmup failed: {e}")
-
 
     def preprocess_batch(self, texts: List[str]) -> Dict[str, torch.Tensor]:
         """Tokenize and prepare batch of texts for model input"""
@@ -116,7 +122,6 @@ class BullyingClassifier:
         )
         return {key: value.to(self.device) for key, value in encoding.items()}
 
-
     def predict_single(self, text: str) -> Dict[str, Any]:
         """Predict cyberbullying for a single message"""
         return self.predict_batch([text])[0]
@@ -126,17 +131,16 @@ class BullyingClassifier:
             all_results = []
 
             for i in range(0, len(texts), self.batch_size):
-                batch_texts = texts[i:i + self.batch_size] #get texts from i tll i+batch size
+                # get texts from i tll i+batch size
+                batch_texts = texts[i:i + self.batch_size]
                 batch_results = self._process_batch(batch_texts)
                 all_results.extend(batch_results)
 
             return all_results
 
-
         except Exception as e:
             logger.error(f"Error in batch prediction: {e}")
             raise e
-
 
     def _process_batch(self, texts: List[str]) -> List[Dict[str, Any]]:
         try:
@@ -148,7 +152,8 @@ class BullyingClassifier:
                 else:
                     outputs = self.model(**inputs)
 
-                probabilities = torch.nn.functional.softmax(outputs.logits, dim=-1)
+                probabilities = torch.nn.functional.softmax(
+                    outputs.logits, dim=-1)
                 predictions = torch.argmax(probabilities, dim=-1)
                 confidences = torch.max(probabilities, dim=-1).values
 
@@ -171,10 +176,12 @@ class BullyingClassifier:
 
         except Exception as e:
             logger.error(f"Error processing batch chunk: {e}")
+            logger.error(traceback.format_exc()) 
             raise e
 
+
 logger.info("Initializing BERT classifier...")
-classifier = BullyingClassifier
+classifier = BullyingClassifier()
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -185,6 +192,7 @@ app = FastAPI(
 
 # Reduced thread pool for GPU workloads (GPU handles parallelism internally)
 executor = ThreadPoolExecutor(max_workers=int(os.getenv("MAX_WORKERS", "4")))
+
 
 @app.get("/gpu/memory")
 async def gpu_memory_stats():
@@ -200,6 +208,7 @@ async def gpu_memory_stats():
         "max_memory_allocated": f"{torch.cuda.max_memory_allocated(device_id) / 1e9:.2f}GB",
         "max_memory_reserved": f"{torch.cuda.max_memory_reserved(device_id) / 1e9:.2f}GB"
     }
+
 
 @app.post("/predict", response_model=PredictionResponse)
 async def predict_message(request: MessageRequest):
@@ -220,6 +229,7 @@ async def predict_message(request: MessageRequest):
     except Exception as e:
         logger.error(f"Error processing single prediction: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.post("/predict/batch", response_model=BatchPredictionResponse)
 async def predict_batch_messages(request: BatchMessageRequest):
