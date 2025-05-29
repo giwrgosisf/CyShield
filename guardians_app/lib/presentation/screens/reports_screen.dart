@@ -24,21 +24,25 @@ class ReportsScreen extends StatefulWidget {
 
 class _ReportsScreenState extends State<ReportsScreen> {
   List<String> kidIds = [];
+  bool _hasTriggeredLoad = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    // Extract arguments passed from navigation
-    final args =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-    if (args != null && args['kidIds'] != null) {
-      kidIds = List<String>.from(args['kidIds']);
+    if (!_hasTriggeredLoad) {
+      // Extract arguments passed from navigation
+      final args =
+          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+      if (args != null && args['kidIds'] != null) {
+        kidIds = List<String>.from(args['kidIds']);
 
-      // Trigger loading reports when we first get the kidIds
-      if (kidIds.isNotEmpty) {
-        print('DEBUG: Triggering LoadReports with kidIds: $kidIds');
-        context.read<ReportsBloc>().add(LoadReports(kidIds));
+        // Trigger loading reports when we first get the kidIds
+        if (kidIds.isNotEmpty) {
+          print('DEBUG: Triggering LoadReports with kidIds: $kidIds');
+          context.read<ReportsBloc>().add(LoadReports(kidIds));
+          _hasTriggeredLoad = true;
+        }
       }
     }
   }
@@ -100,11 +104,15 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
               // Debug each kid
               for (var kid in state.kidsWithFlags) {
-                print('DEBUG: Kid ${kid.firstName} has ${kid.flaggedMessages.length} flagged messages');
+                print(
+                  'DEBUG: Kid ${kid.firstName} has ${kid.flaggedMessages.length} flagged messages',
+                );
               }
 
               final kidsWithFlags = state.kidsWithFlaggedMessages;
-              print('DEBUG: Kids with non-empty flags: ${kidsWithFlags.length}');
+              print(
+                'DEBUG: Kids with non-empty flags: ${kidsWithFlags.length}',
+              );
 
               if (kidsWithFlags.isEmpty) {
                 print('DEBUG: No kids with flags, showing empty state');
@@ -142,7 +150,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   ),
                 );
               }
-              print('DEBUG: Showing reports list with ${kidsWithFlags.length} kids');
+              print(
+                'DEBUG: Showing reports list with ${kidsWithFlags.length} kids',
+              );
               return RefreshIndicator(
                 color: AppTheme.secondary,
                 onRefresh: () async {
@@ -153,7 +163,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   itemCount: kidsWithFlags.length,
                   itemBuilder: (context, index) {
                     final kid = kidsWithFlags[index];
-                    print('DEBUG: Building child report for ${kid.firstName} with ${kid.flaggedMessages.length} messages');
+                    print(
+                      'DEBUG: Building child report for ${kid.firstName} with ${kid.flaggedMessages.length} messages',
+                    );
                     return _buildChildReports(context, kid);
                   },
                 ),

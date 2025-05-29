@@ -13,6 +13,8 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
     on<LoadReports>(_onLoadReports);
     on<MarkMessageAsReviewed>(_onMarkMessageAsReviewed);
     on<RefreshReports>(_onRefreshReports);
+
+    print('DEBUG: ReportsBloc initialized');
   }
 
   Future<void> _onLoadReports(
@@ -20,6 +22,10 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
     Emitter<ReportsState> emit,
   ) async {
     print('DEBUG: _onLoadReports called with kidIds: ${event.kidIds}');
+    if (isClosed) {
+      print('DEBUG: Bloc is already closed, skipping load');
+      return;
+    }
     emit(ReportsLoading());
     print('DEBUG: Emitted ReportsLoading');
     try {
@@ -35,17 +41,18 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
                 print('DEBUG: Stream - Kid ${kid.firstName} has ${kid.flaggedMessages.length} flagged messages');
               }
 
-              if (!isClosed && !emit.isDone) {
-                print('DEBUG: Emitting ReportsLoaded with ${kidsWithFlags.length} kids');
-                emit(ReportsLoaded(kidsWithFlags: kidsWithFlags));
-                print('DEBUG: Successfully emitted ReportsLoaded');
-              }else{
-                print('DEBUG: Bloc is closed or emit is done, skipping emit');
+              if (isClosed) {
+                print('DEBUG: Bloc is closed, skipping emit');
+                return;
               }
+
+              print('DEBUG: Emitting ReportsLoaded with ${kidsWithFlags.length} kids');
+              emit(ReportsLoaded(kidsWithFlags: kidsWithFlags));
+              print('DEBUG: Successfully emitted ReportsLoaded');
             },
             onError: (error) {
               print('DEBUG: Stream error: $error');
-              if (!isClosed && !emit.isDone) {
+              if (!isClosed) {
                 emit(ReportsError('Failed to load reports: $error'));
               }
             },
@@ -53,7 +60,7 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
       print('DEBUG: Stream subscription established');
     } catch (e) {
       print('DEBUG: Exception in _onLoadReports: $e');
-      if (!emit.isDone) {
+      if (!isClosed) {
         emit(ReportsError('Failed to load reports: $e'));
       }
     }
@@ -76,13 +83,13 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
     Emitter<ReportsState> emit,
   ) async {
     print('DEBUG: _onRefreshReports called');
-    if (state is ReportsLoaded) {
+    if (state is ReportsLoaded && !isClosed ) {
       final currentState = state as ReportsLoaded;
       emit(currentState.copyWith(isRefreshing: true));
 
       await Future.delayed(const Duration(milliseconds: 250));
 
-      if (!emit.isDone &&  state is ReportsLoaded) {
+      if (!isClosed  &&  state is ReportsLoaded) {
         final newState = state as ReportsLoaded;
         emit(newState.copyWith(isRefreshing: false));
       }
