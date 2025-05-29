@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guardians_app/core/app_theme.dart';
 import 'package:guardians_app/core/containers/strings.dart';
+import 'package:guardians_app/presentation/widgets/custom_appbar.dart';
 // import 'package:guardians_app/presentation/screens/reports_screen.dart'; // ReportsScreen might not be directly navigated to from here
 import '../../bloc/reports/reports_bloc.dart'; // Keep if used elsewhere
 import '../../bloc/reports/reports_event.dart'; // Keep if used elsewhere
@@ -59,40 +60,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppTheme.secondary,
-        actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert, color: Colors.white),
-            onSelected: (value) {},
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              const PopupMenuItem<String>(
-                value: 'settings',
-                child: Text('Settings'),
-              ),
-              const PopupMenuItem<String>(
-                value: 'help',
-                child: Text('Help'),
-              ),
-            ],
-          ),
-        ],
-        elevation: 10,
-        shadowColor: Colors.black.withAlpha((255).round()),
-        title:  Text(
-          MyText.appTitle,
-          style: TextStyle(
-            color: Colors.white,
-            fontFamily: 'ArbutusSlab',
-            fontSize: 30,
-            letterSpacing: 1,
-          ),
-        ),
-        centerTitle: true,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(12)),
-        ),
-      ),
+      appBar: CustomAppBar(title: 'CyShield'),
       body: BlocProvider(
         create: (context) => StatisticsBloc(KidRepository())..add(LoadStatistics(kidIds)),
         child: Column(
@@ -134,17 +102,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                       ),
                     ),
                   ),
-                  Positioned(
-                    left: 0,
-                    top: 0,
-                    bottom: 0,
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.black),
-                      onPressed:(){
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ),
+                  
                 ],
               ),
             ),
@@ -209,7 +167,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: Text(
-            'Weekly Message Breakdown for: $kidName',
+            'Εβδομαδιαία στατιστικά για το παιδί: $kidName',
             style: Theme.of(context).textTheme.titleLarge,
             textAlign: TextAlign.center,
           ),

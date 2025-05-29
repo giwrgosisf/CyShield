@@ -148,14 +148,13 @@ class KidRepository {
 
 
         if (message.time.isAfter(weekStart.subtract(const Duration(milliseconds: 1))) && message.time.isBefore(weekEnd)) {
-          if (message.probability >= 0.8) {
-            weeklyCounts[i]!['toxic'] = (weeklyCounts[i]!['toxic'] ?? 0) + 1;
-          } else if (message.probability >= 0.3) {
-            weeklyCounts[i]!['moderate'] = (weeklyCounts[i]!['moderate'] ?? 0) + 1;
-          } else {
-            weeklyCounts[i]!['healthy'] = (weeklyCounts[i]!['healthy'] ?? 0) + 1;
-          }
-          break; // Message categorized for this week, move to next message
+
+            weeklyCounts[i]!['toxic'] = await getKidToxicCount(kidId);
+
+            weeklyCounts[i]!['moderate'] = await getKidModerateCount(kidId);
+
+            weeklyCounts[i]!['healthy'] = await getKidHealthyCount(kidId);
+
         }
       }
     }
@@ -174,6 +173,8 @@ class KidRepository {
   }
 
   // In KidRepository.dart
+
+
 
   Future<List<KidProfile>> getKidsByIds(List<String> kidIds) async {
     print('DEBUG: KidRepository - getKidsByIds called with IDs: $kidIds');
@@ -231,5 +232,60 @@ class KidRepository {
       return []; // Return an empty list on error
     }
   }
+
+  Future<int> getKidHealthyCount(String kidId) async {
+    try {
+      final docSnapshot = await _db.collection('kids').doc(kidId).get();
+      if (docSnapshot.exists && docSnapshot.data() != null) {
+        final data = docSnapshot.data()!;
+        final healthyCount = data['healthy'] as int?; // Cast to int, allow null
+        print('DEBUG: Fetched healthy count for kid $kidId: $healthyCount');
+        return healthyCount ?? 0; // Return 0 if 'healthy' field is null or not found
+      } else {
+        print('DEBUG: Kid document with ID $kidId not found or has no data.');
+        return 0; // Kid document not found
+      }
+    } catch (e) {
+      debugPrint('ERROR: getKidHealthyCount for $kidId: $e');
+      return 0; // Return 0 in case of any error
+    }
+  }
+
+  Future<int> getKidModerateCount(String kidId) async {
+    try {
+      final docSnapshot = await _db.collection('kids').doc(kidId).get();
+      if (docSnapshot.exists && docSnapshot.data() != null) {
+        final data = docSnapshot.data()!;
+        final moderateCount = data['moderate'] as int?; // Cast to int, allow null
+        print('DEBUG: Fetched healthy count for kid $kidId: $moderateCount');
+        return moderateCount ?? 0; // Return 0 if 'healthy' field is null or not found
+      } else {
+        print('DEBUG: Kid document with ID $kidId not found or has no data.');
+        return 0; // Kid document not found
+      }
+    } catch (e) {
+      debugPrint('ERROR: getKidHealthyCount for $kidId: $e');
+      return 0; // Return 0 in case of any error
+    }
+  }
+
+  Future<int> getKidToxicCount(String kidId) async {
+    try {
+      final docSnapshot = await _db.collection('kids').doc(kidId).get();
+      if (docSnapshot.exists && docSnapshot.data() != null) {
+        final data = docSnapshot.data()!;
+        final toxicCount = data['toxic'] as int?; // Cast to int, allow null
+        print('DEBUG: Fetched healthy count for kid $kidId: $toxicCount');
+        return toxicCount ?? 0; // Return 0 if 'healthy' field is null or not found
+      } else {
+        print('DEBUG: Kid document with ID $kidId not found or has no data.');
+        return 0; // Kid document not found
+      }
+    } catch (e) {
+      debugPrint('ERROR: getKidHealthyCount for $kidId: $e');
+      return 0; // Return 0 in case of any error
+    }
+  }
+
 }
 
