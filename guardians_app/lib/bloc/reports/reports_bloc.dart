@@ -19,25 +19,40 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
     LoadReports event,
     Emitter<ReportsState> emit,
   ) async {
+    print('DEBUG: _onLoadReports called with kidIds: ${event.kidIds}');
     emit(ReportsLoading());
+    print('DEBUG: Emitted ReportsLoading');
     try {
       await _reportsSubscription?.cancel();
+      print('DEBUG: Cancelled previous subscription');
 
       _reportsSubscription = _reportsRepository
           .watchFlaggedReports(event.kidIds)
           .listen(
             (kidsWithFlags) {
+              print('DEBUG: Stream received ${kidsWithFlags.length} kids');
+              for (var kid in kidsWithFlags) {
+                print('DEBUG: Stream - Kid ${kid.firstName} has ${kid.flaggedMessages.length} flagged messages');
+              }
+
               if (!isClosed && !emit.isDone) {
+                print('DEBUG: Emitting ReportsLoaded with ${kidsWithFlags.length} kids');
                 emit(ReportsLoaded(kidsWithFlags: kidsWithFlags));
+                print('DEBUG: Successfully emitted ReportsLoaded');
+              }else{
+                print('DEBUG: Bloc is closed or emit is done, skipping emit');
               }
             },
             onError: (error) {
+              print('DEBUG: Stream error: $error');
               if (!isClosed && !emit.isDone) {
                 emit(ReportsError('Failed to load reports: $error'));
               }
             },
           );
+      print('DEBUG: Stream subscription established');
     } catch (e) {
+      print('DEBUG: Exception in _onLoadReports: $e');
       if (!emit.isDone) {
         emit(ReportsError('Failed to load reports: $e'));
       }
@@ -60,6 +75,7 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
     RefreshReports event,
     Emitter<ReportsState> emit,
   ) async {
+    print('DEBUG: _onRefreshReports called');
     if (state is ReportsLoaded) {
       final currentState = state as ReportsLoaded;
       emit(currentState.copyWith(isRefreshing: true));
@@ -75,6 +91,7 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
 
   @override
   Future<void> close() {
+    print('DEBUG: ReportsBloc closing');
     _reportsSubscription?.cancel();
     return super.close();
   }

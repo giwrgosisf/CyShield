@@ -37,6 +37,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
       // Trigger loading reports when we first get the kidIds
       if (kidIds.isNotEmpty) {
+        print('DEBUG: Triggering LoadReports with kidIds: $kidIds');
         context.read<ReportsBloc>().add(LoadReports(kidIds));
       }
     }
@@ -49,13 +50,16 @@ class _ReportsScreenState extends State<ReportsScreen> {
       body: SafeArea(
         child: BlocBuilder<ReportsBloc, ReportsState>(
           builder: (context, state) {
+            print('DEBUG: BlocBuilder state: $state');
             if (state is ReportsInitial || state is ReportsLoading) {
+              print('DEBUG: Showing loading indicator');
               return const Center(
                 child: CircularProgressIndicator(color: AppTheme.primary),
               );
             }
 
             if (state is ReportsError) {
+              print('DEBUG: Showing error state: ${state.message}');
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -91,9 +95,19 @@ class _ReportsScreenState extends State<ReportsScreen> {
               );
             }
             if (state is ReportsLoaded) {
+              print('DEBUG: ReportsLoaded state received');
+              print('DEBUG: All kids count: ${state.kidsWithFlags.length}');
+
+              // Debug each kid
+              for (var kid in state.kidsWithFlags) {
+                print('DEBUG: Kid ${kid.firstName} has ${kid.flaggedMessages.length} flagged messages');
+              }
+
               final kidsWithFlags = state.kidsWithFlaggedMessages;
+              print('DEBUG: Kids with non-empty flags: ${kidsWithFlags.length}');
 
               if (kidsWithFlags.isEmpty) {
+                print('DEBUG: No kids with flags, showing empty state');
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -117,11 +131,18 @@ class _ReportsScreenState extends State<ReportsScreen> {
                         'Όλα τα παιδιά σας είναι ασφαλή!',
                         style: TextStyle(fontSize: 14, color: Colors.grey[500]),
                       ),
+                      const SizedBox(height: 24),
+                      // Debug info
+                      if (state.kidsWithFlags.isNotEmpty)
+                        Text(
+                          'DEBUG: Found ${state.kidsWithFlags.length} kids total, but none with flagged messages',
+                          style: TextStyle(fontSize: 12, color: Colors.red),
+                        ),
                     ],
                   ),
                 );
               }
-
+              print('DEBUG: Showing reports list with ${kidsWithFlags.length} kids');
               return RefreshIndicator(
                 color: AppTheme.secondary,
                 onRefresh: () async {
@@ -132,12 +153,13 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   itemCount: kidsWithFlags.length,
                   itemBuilder: (context, index) {
                     final kid = kidsWithFlags[index];
+                    print('DEBUG: Building child report for ${kid.firstName} with ${kid.flaggedMessages.length} messages');
                     return _buildChildReports(context, kid);
                   },
                 ),
               );
             }
-
+            print('DEBUG: Fallback - returning empty SizedBox');
             return const SizedBox();
           },
         ),
