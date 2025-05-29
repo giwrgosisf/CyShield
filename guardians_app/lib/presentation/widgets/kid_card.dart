@@ -30,11 +30,11 @@ class KidCard extends StatelessWidget {
               ),
             ),
             Positioned(
-              left: 10,
-              top: 10,
+              left: 5,
+              top: 5,
               child: CircleAvatar(
-                radius: 50,
-                backgroundColor: Colors.grey[200],
+                radius: 55,
+                backgroundColor: Colors.transparent,
                 backgroundImage:
                     kid.photoURL != null
                         ? NetworkImage(kid.photoURL!)
