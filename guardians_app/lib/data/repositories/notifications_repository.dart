@@ -89,6 +89,11 @@ class NotificationRepository {
       'kids': FieldValue.arrayUnion([kidId]),
     });
 
+    final kidDoc = _db.collection('kids').doc(kidId);
+    batch.update(kidDoc, {
+      'parents': FieldValue.arrayUnion([_uid]),
+    });
+
     batch.delete(parentId.collection('notifications').doc(notificationId));
 
     return batch.commit();
