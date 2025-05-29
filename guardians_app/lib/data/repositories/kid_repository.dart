@@ -113,6 +113,55 @@ class KidRepository {
     });
   }
 
+
+  Future<Map<int, Map<String, int>>> getWeeklyMessageCountsForKid(String kidId) async {
+    final kidProfile = await _watchKidAndMessages(kidId).first;
+
+    final Map<int, Map<String, int>> weeklyCounts = {};
+
+    final now = DateTime.now();
+    // Calculate the start of the current week (Monday)
+    DateTime startOfCurrentWeek = now.subtract(Duration(days: now.weekday - 1));
+    if (now.weekday == DateTime.sunday) { // Adjust for Sunday being 7 in Dart's weekday
+      startOfCurrentWeek = now.subtract(const Duration(days: 6));
+    }
+    startOfCurrentWeek = DateTime(startOfCurrentWeek.year, startOfCurrentWeek.month, startOfCurrentWeek.day);
+
+
+
+    for (int i = 0; i < 4; i++) {
+      weeklyCounts[i] = {
+        'toxic': 0,
+        'moderate': 0,
+        'healthy': 0,
+      };
+    }
+
+    for (final message in kidProfile.flaggedMessages) {
+
+      for (int i = 0; i < 4; i++) {
+        DateTime weekStart = startOfCurrentWeek.subtract(Duration(days: i * 7));
+        DateTime weekEnd = weekStart.add(const Duration(days: 7));
+
+        // Adjust weekEnd to be end of day to include messages from the last day of the week
+        weekEnd = DateTime(weekEnd.year, weekEnd.month, weekEnd.day, 23, 59, 59, 999);
+
+
+        if (message.time.isAfter(weekStart.subtract(const Duration(milliseconds: 1))) && message.time.isBefore(weekEnd)) {
+          if (message.probability >= 0.8) {
+            weeklyCounts[i]!['toxic'] = (weeklyCounts[i]!['toxic'] ?? 0) + 1;
+          } else if (message.probability >= 0.3) {
+            weeklyCounts[i]!['moderate'] = (weeklyCounts[i]!['moderate'] ?? 0) + 1;
+          } else {
+            weeklyCounts[i]!['healthy'] = (weeklyCounts[i]!['healthy'] ?? 0) + 1;
+          }
+          break; // Message categorized for this week, move to next message
+        }
+      }
+    }
+    return weeklyCounts;
+  }
+
   Stream<List<KidProfile>> watchKidsWithFlags(List<String> kidIds) {
     print('DEBUG: watchKidsWithFlags called with kidIds: $kidIds');
     if (kidIds.isEmpty) return Stream.value(<KidProfile>[]);
@@ -123,4 +172,64 @@ class KidRepository {
       return <KidProfile>[];
     });
   }
+
+  // In KidRepository.dart
+
+  Future<List<KidProfile>> getKidsByIds(List<String> kidIds) async {
+    print('DEBUG: KidRepository - getKidsByIds called with IDs: $kidIds');
+    if (kidIds.isEmpty) {
+      print('DEBUG: KidRepository - getKidsByIds: input kidIds is empty, returning [].');
+      return [];
+    }
+
+    try {
+      if (kidIds.length <= 10) {
+        final QuerySnapshot<Map<String, dynamic>> snapshot = await _db
+            .collection('kids')
+            .where(FieldPath.documentId, whereIn: kidIds)
+            .get();
+        print('DEBUG: KidRepository - getKidsByIds (<=10): Firestore query executed.');
+        print('DEBUG: KidRepository - getKidsByIds (<=10): Fetched ${snapshot.docs.length} documents.');
+
+        if (snapshot.docs.isEmpty) {
+          print('DEBUG: KidRepository - getKidsByIds (<=10): No documents found for IDs: $kidIds');
+        }
+
+        return snapshot.docs
+            .map((doc) {
+          if (!doc.exists || doc.data() == null) {
+            print('DEBUG: KidRepository - Doc ${doc.id} does not exist or has no data, skipping.');
+            // You might want to return null or throw an error here, or filter it out later
+            return null; // Temporarily return null to see if it causes issues later
+          }
+          print('DEBUG: KidRepository - Mapped doc ${doc.id} to KidProfile.');
+          return KidProfile.fromMap(doc.id, doc.data()!);
+        })
+            .whereType<KidProfile>() // Filter out any nulls if you return null above
+            .toList();
+      } else {
+        print('DEBUG: KidRepository - getKidsByIds (>10): Fetching individually for ${kidIds.length} IDs.');
+        final List<Future<KidProfile>> futures = kidIds.map((id) async {
+          final DocumentSnapshot<Map<String, dynamic>> doc =
+          await _db.collection('kids').doc(id).get();
+          if (doc.exists && doc.data() != null) {
+            print('DEBUG: KidRepository - Fetched individual doc for ${id}. Exists: true');
+            return KidProfile.fromDoc(doc);
+          } else {
+            print('DEBUG: KidRepository - Individual doc ${id} does not exist or has no data. Returning default profile.');
+            return KidProfile(id: id, firstName: 'Unknown', photoURL: null);
+          }
+        }).toList();
+        final results = await Future.wait(futures);
+        print('DEBUG: KidRepository - getKidsByIds (>10): Fetched ${results.length} kids individually.');
+        return results;
+      }
+    } catch (e, st) {
+      debugPrint('ERROR: KidRepository - Error getting kids by IDs: $e\n$st');
+      // This is crucial: if an error occurs, it means something went wrong with Firestore itself
+      // Check logs for specific FirebaseException messages
+      return []; // Return an empty list on error
+    }
+  }
 }
+

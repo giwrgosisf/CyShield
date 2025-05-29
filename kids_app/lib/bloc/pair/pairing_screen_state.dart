@@ -6,11 +6,11 @@ enum PairingScreenStatus {
   success,
   failure,
   pairingInProgress,
-  pairingPending,      // New: Waiting for guardian response
+  pairingPending,
   pairingSuccess,
   pairingFailure,
   pairingRejected,
-  pairingTimeout       // New: Request timed out
+  pairingTimeout, initial
 }
 
 class PairingScreenState extends Equatable {
@@ -109,7 +109,7 @@ class PairingScreenState extends Equatable {
     lastNetworkType: networkType,
   );
 
-  // Add copyWith method for easier state updates
+
   PairingScreenState copyWith({
     PairingScreenStatus? status,
     KidProfile? profile,

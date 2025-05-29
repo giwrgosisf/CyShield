@@ -19,6 +19,8 @@ import 'bloc/home/home_cubit.dart';
 import 'bloc/notifications/notifications_cubit.dart';
 import 'bloc/profile/profile_cubit.dart';
 import 'bloc/reports/reports_bloc.dart';
+import 'bloc/statistics/statistics_bloc.dart';
+import 'bloc/statistics/statistics_event.dart';
 import 'core/services/notification_service.dart';
 import 'firebase_options.dart';
 
@@ -128,8 +130,31 @@ class _CyshieldGuardiansAppState extends State<CyShieldGuardiansApp> {
                 ),
                 settings: settings,
               );
-            // case '/statistics':
-            //   return MaterialPageRoute(builder: (_) => StatisticsScreen());
+            case '/statistics':
+            // Extract kidIds from settings first, as we need them for the Bloc's initial event
+              final Map<String, dynamic>? args = settings.arguments as Map<String, dynamic>?;
+              final List<String> kidIds = List<String>.from(args?['kidIds'] ?? []); // Safe extraction
+
+              print('DEBUG: onGenerateRoute - /statistics - extracted kidIds for Bloc: $kidIds');
+
+              return MaterialPageRoute(
+                builder: (ctx) => BlocProvider<StatisticsBloc>(
+                  // You need to ensure KidRepository is available in the context.
+                  // If KidRepository is provided higher up in your app (e.g., in MaterialApp's MultiRepositoryProvider),
+                  // you can use ctx.read<KidRepository>().
+                  // Otherwise, you might need to provide it here explicitly.
+                  create: (ctx) => StatisticsBloc(
+                    // Assuming KidRepository is already provided somewhere above,
+                    // or you can create a new instance if it's stateless.
+                    // If KidRepository needs to be shared, provide it higher up.
+                    // For now, let's assume it's provided or can be instantiated directly.
+                      ctx.read<KidRepository>() // This assumes KidRepository is available via a parent RepositoryProvider
+                  )..add(LoadStatistics(kidIds)), // Dispatch the event with the extracted kidIds
+                  child: const StatisticsScreen(),
+                ),
+                settings: settings, // Crucial for passing arguments to the screen itself
+              );
+
             case '/notifications':
               return MaterialPageRoute(
                 builder: (_) => BlocProvider(

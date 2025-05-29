@@ -115,7 +115,7 @@ class _Body extends StatelessWidget {
               asset: 'assets/images/home_statistics.png',
               label: 'Στατιστικά',
               onTap: () {
-                Navigator.pushNamed(context, '/statistics');
+                Navigator.pushNamed(context, '/statistics', arguments: {'kidIds': kidIds});
               },
             ),
           ],

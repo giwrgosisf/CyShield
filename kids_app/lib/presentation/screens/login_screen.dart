@@ -17,26 +17,21 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => LoginBloc(context.read<AuthRepository>()),
+      create: (context) => LoginBloc(context.read<AuthRepository>()),
       child: BlocListener<LoginBloc, LoginState>(
         listener: (context, state) {
           if (kDebugMode) {
-            print("LoginScreen Listener: Received state: ${state.status}");
+            print("LoginScreen Listener: RECEIVED STATE: ${state.status}");
+            print("LoginScreen Listener: Phone number in state: '${state.phoneNumber}'");
             if (state.errorMessage != null) {
-              print("LoginScreen Listener: Error: ${state.errorMessage}");
+              print("LoginScreen Listener: Error Message: ${state.errorMessage}");
             }
           }
-          if (state.status == LoginStatus.requiresPhoneNumber) {
-            if (kDebugMode) {
-              print("LoginScreen Listener: Action: Showing phone dialog");
-            }
-            _showPhoneNumberDialog(context);
-          } else if (state.status == LoginStatus.success) {
-            if (kDebugMode) {
-              print("LoginScreen Listener: Action: Navigating to /pairing");
-            }
-            // Navigate to pairing screen on success
-            Navigator.pushReplacementNamed(context, '/pairing');
+          if (state.status == LoginStatus.submittingWithGoogle) {
+
+               _showPhoneNumberDialog(context);
+
+
           } else if (state.status == LoginStatus.failure) {
             if (kDebugMode) {
               print("LoginScreen Listener: Action: Showing SnackBar");
@@ -148,7 +143,7 @@ class LoginScreen extends StatelessWidget {
                     BlocBuilder<LoginBloc, LoginState>(
                       builder: (context, state) {
                         return GoogleLoginButton(
-                          onPressed: state.status == LoginStatus.submitting
+                          onPressed: state.status == LoginStatus.submittingWithGoogle
                               ? null
                               : () => context.read<LoginBloc>().add(LoginWithGooglePressed()),
                         );
@@ -168,10 +163,10 @@ class LoginScreen extends StatelessWidget {
     if (kDebugMode) print("LoginScreen: Attempting to show phone number dialog...");
     showDialog(
       context: context,
-      barrierDismissible: false, // Prevent dismissing by tapping outside
+      barrierDismissible: false,
       builder: (dialogContext) => BlocProvider.value(
-        value: context.read<LoginBloc>(), // Share the same bloc instance
-        child: Builder( // Added Builder here to get a fresh context for internal logging
+        value: context.read<LoginBloc>(),
+        child: Builder(
             builder: (innerBuilderContext) {
               if (kDebugMode) print("Phone Dialog: Building content for dialog.");
               return BlocListener<LoginBloc, LoginState>(
@@ -186,7 +181,7 @@ class LoginScreen extends StatelessWidget {
                     if (kDebugMode) {
                       print("Phone Dialog Listener: Action: Pop dialog, Navigate to /pairing");
                     }
-                    Navigator.of(dialogContext).pop(); // Close dialog first
+                    Navigator.of(dialogContext).pop();
                     Navigator.pushReplacementNamed(context, '/pairing');
                   } else if (state.status == LoginStatus.failure) {
                     if (kDebugMode) {
@@ -197,7 +192,7 @@ class LoginScreen extends StatelessWidget {
                   }
                 },
                 child: BlocBuilder<LoginBloc, LoginState>(
-                  buildWhen: (p, c) => p.status != c.status || p.phoneNumber != c.phoneNumber, // Only rebuild on status or phone number change
+                  buildWhen: (p, c) => p.status != c.status || p.phoneNumber != c.phoneNumber,
                   builder: (context, state) {
                     return AlertDialog(
                       title: const Text('Enter Phone Number'),
@@ -209,7 +204,7 @@ class LoginScreen extends StatelessWidget {
                               PhoneNumberChanged(value),
                             ),
                             decoration: const InputDecoration(
-                              hintText: '+1234567890',
+                              hintText: '+3034567890',
                               labelText: 'Phone Number',
                             ),
                             keyboardType: TextInputType.phone,
@@ -236,7 +231,7 @@ class LoginScreen extends StatelessWidget {
                               ? null
                               : () {
                             if (kDebugMode) print("Phone Dialog: Submit button pressed.");
-                            context.read<LoginBloc>().add(PhoneNumberSubmitted());
+                            context.read<LoginBloc>().add(PhoneNumberSubmitted(state.phoneNumber));
                           },
                           child: const Text('Submit'),
                         ),

@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../core/app_theme.dart';
@@ -59,7 +59,7 @@ class PairingFailureDialog extends StatelessWidget {
             Expanded(
               child: OutlinedButton(
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  onCancel?.call();
                 },
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: Colors.grey),

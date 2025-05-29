@@ -26,6 +26,9 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
       emit(state.copyWith(confirmPassword: e.confirmPassword));
     });
     on<RegisterWithEmailPressed>(_registerWithEmailPressed);
+    on<PhoneNumberRegisterChanged>((e, emit) {
+      emit(state.copyWith(phoneNumber: e.phone));
+    });
   }
 
 
