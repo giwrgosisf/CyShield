@@ -82,10 +82,27 @@ class FirebaseUserRepository implements UserRepository {
   }
 
   @override
-  Future<void> removeKid(String kidId) {
-    return _db.collection('users').doc(_uid).update({
-      'kids': FieldValue.arrayRemove([kidId]),
-    });
+  Future<void> removeKid(String kidId) async{
+    try{
+      final batch = _db.batch();
+
+      final parentRef = _db.collection('users').doc(_uid);
+      batch.update(parentRef, {
+        'kids': FieldValue.arrayRemove([kidId]),
+      });
+
+      final kidRef = _db.collection('kids').doc(kidId);
+      batch.update(kidRef, {
+        'parents': FieldValue.arrayRemove([_uid]),
+      });
+
+      await batch.commit();
+    }catch (e){
+      debugPrint('removeKid error: $e');
+      rethrow;
+
+    }
+
   }
 
   // @override
