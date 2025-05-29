@@ -35,6 +35,8 @@ class KidProfile {
 
   double get totalMessages => flaggedMessages.length.toDouble();
 
+  String get name => firstName;
+
   KidProfile copyWith({ List<MessageModel>? flaggedMessages }) {
     return KidProfile(
       id: id,

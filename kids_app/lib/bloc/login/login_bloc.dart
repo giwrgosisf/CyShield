@@ -55,7 +55,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       Emitter<LoginState> emit,
       ) async {
     if (kDebugMode) print("LoginBloc: _onGoogleLogin - Initial state: ${state.status}");
-    emit(state.copyWith(status: LoginStatus.submitting)); // Set to submitting
+    emit(state.copyWith(status: LoginStatus.submittingWithGoogle));
     if (kDebugMode) print("LoginBloc: _onGoogleLogin - Emitting submitting");
 
     try {
@@ -126,7 +126,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       return;
     }
 
-    emit(state.copyWith(status: LoginStatus.submitting));
+
     if (kDebugMode) print("LoginBloc: _onPhoneNumberSubmitted - Emitting submitting for phone save");
     try {
       await _authModel.savePhoneNumber(currentUser.uid, state.phoneNumber);

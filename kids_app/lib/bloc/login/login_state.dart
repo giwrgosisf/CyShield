@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-enum LoginStatus { initial, submitting, success, failure, requiresPhoneNumber }
+enum LoginStatus { initial, submitting, success, failure, submittingWithGoogle, requiresPhoneNumber, googleAuthorizationSucces }
 
 class LoginState extends Equatable {
   final String email;

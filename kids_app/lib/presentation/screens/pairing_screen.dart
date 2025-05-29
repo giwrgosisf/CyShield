@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -67,6 +69,7 @@ class _PairingScreenState extends State<PairingScreen> {
           listenWhen: (prev, curr) {
             return prev.status != curr.status &&
                 (curr.status == PairingScreenStatus.failure ||
+                    curr.status == PairingScreenStatus.success||
                     curr.status == PairingScreenStatus.pairingSuccess ||
                     curr.status == PairingScreenStatus.pairingFailure ||
                     curr.status == PairingScreenStatus.pairingRejected ||
@@ -134,13 +137,11 @@ class _PairingScreenState extends State<PairingScreen> {
                   context,
                   errorMessage: state.errorMessage ?? 'Failed to send pairing request',
                   onCancel: () {
-                    Navigator.of(context).pop();
-                    _isDialogShowing = false;
+                    exit(0);
                   },
                   onRetry: () {
-                    Navigator.of(context).pop();
                     _isDialogShowing = false;
-                    context.read<PairingScreenCubit>().retryPairing();
+                    context.read<PairingScreenCubit>().resetPairingStatus();
                   },
                 );
                 break;
@@ -180,11 +181,12 @@ class _PairingScreenState extends State<PairingScreen> {
                   onCancel: () {
                     Navigator.of(context).pop();
                     _isDialogShowing = false;
+                    context.read<PairingScreenCubit>().resetPairingStatus();
                   },
                   onRetry: () {
                     Navigator.of(context).pop();
                     _isDialogShowing = false;
-                    context.read<PairingScreenCubit>().retryPairing();
+                    context.read<PairingScreenCubit>().resetPairingStatus();
                   },
                 );
                 break;
@@ -209,6 +211,9 @@ class _PairingScreenState extends State<PairingScreen> {
                 );
 
               case PairingScreenStatus.success:
+                if (state.profile == null) {
+                  return const Center(child: CircularProgressIndicator());
+                }
                 final firstName = state.profile!.firstName;
                 return _Body(
                   firstName: firstName,
@@ -254,6 +259,10 @@ class _PairingScreenState extends State<PairingScreen> {
                   onNetworkSelected: (networkType) {
                     _selectedNetworkType = networkType;
                   },
+                );
+              case PairingScreenStatus.initial:
+                return const Center(
+                  child: CircularProgressIndicator(color: AppTheme.primary),
                 );
             }
           },

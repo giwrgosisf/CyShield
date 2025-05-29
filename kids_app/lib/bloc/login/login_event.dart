@@ -30,4 +30,9 @@ class PhoneNumberChanged extends LoginEvent {
   List<Object?> get props => [phoneNumber];
 }
 
-class PhoneNumberSubmitted extends LoginEvent {}
+class PhoneNumberSubmitted extends LoginEvent {
+  final String phoneNumber;
+  PhoneNumberSubmitted(this.phoneNumber);
+  @override
+  List<Object?> get props => [phoneNumber];
+}

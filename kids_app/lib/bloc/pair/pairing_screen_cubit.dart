@@ -196,33 +196,11 @@ class PairingScreenCubit extends Cubit<PairingScreenState>{
     return completer.future;
   }
 
-  void cancelPairing() {
-    _pairingStatusSub?.cancel();
-    emit(state.copyWith(
-      status: PairingScreenStatus.success,
-      errorMessage: null,
-    ));
-  }
-
-  void retryPairing() {
-    if (state.lastParentId != null && state.lastNetworkType != null) {
-      connectToGuardian(
-        parentId: state.lastParentId!,
-        networkType: state.lastNetworkType!,
-      );
-    }
-  }
 
   void resetPairingStatus() {
     _pairingStatusSub?.cancel();
-    emit(state.copyWith(
-      status: PairingScreenStatus.success,
-      errorMessage: null,
-    ));
+    emit(PairingScreenState.success(profile: _currentProfile!));
   }
-
-
-
 
   @override
   Future<void> close() {
