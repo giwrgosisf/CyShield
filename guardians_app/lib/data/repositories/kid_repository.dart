@@ -44,6 +44,7 @@ class KidRepository {
   }
 
   Stream<KidProfile> _watchKidAndMessages(String kidId) {
+    print('DEBUG: _watchKidAndMessages called for kidId: $kidId');
     final doc = _db.collection('kids').doc(kidId).snapshots().handleError((
       e,
       st,
@@ -63,29 +64,63 @@ class KidRepository {
       DocumentSnapshot<Map<String, dynamic>> doc,
       QuerySnapshot<Map<String, dynamic>> snap,
     ) {
+      print('DEBUG: Processing data for kidId: $kidId, doc exists: ${doc.exists}');
+      if (!doc.exists || doc.data() == null) {
+        print('DEBUG: Document does not exist or has no data for kidId: $kidId');
+        return KidProfile(
+          id: kidId,
+          firstName: 'Unknown',
+          photoURL: null,
+          flaggedMessages: [],
+        );
+      }
       final docData = doc.data()!;
       final childName = docData['name'] as String? ?? '';
+      print('DEBUG: Found ${snap.docs.length} flagged messages for $childName');
       final mess =
           snap.docs.map((d) {
-            final data = d.data();
-            return MessageModel(
-              childId: kidId,
-              messageId: d.id,
-              senderName: data['senderName'] as String,
-              text: data['text'] as String,
-              probability: data['probability'] as double,
-              time: (data['time'] as Timestamp).toDate(),
-              childName: childName,
-            );
+            try {
+              final data = d.data();
+              return MessageModel(
+                childId: kidId,
+                messageId: d.id,
+                senderName: data['senderName'] as String? ?? 'Unknown',
+                text: data['text'] as String? ?? '',
+                probability: (data['probability'] as num?)?.toDouble() ?? 0.0,
+                time: data['time'] != null
+                    ? (data['time'] as Timestamp).toDate()
+                    : DateTime.now(),
+                childName: childName,
+              );
+            } catch (e) {
+              print('DEBUG: Error parsing message ${d.id}: $e');
+              // Return a default message or skip this message
+              return MessageModel(
+                childId: kidId,
+                messageId: d.id,
+                senderName: 'Unknown',
+                text: 'Error loading message',
+                probability: 0.0,
+                time: DateTime.now(),
+                childName: childName,
+              );
+            }
           }).toList();
 
-      return KidProfile.fromMap(doc.id, docData, flaggedMessages: mess);
+      final kidProfile = KidProfile.fromMap(doc.id, docData, flaggedMessages: mess);
+      print('DEBUG: Created KidProfile for ${kidProfile.firstName} with ${mess.length} flagged messages');
+      return kidProfile;
     });
   }
 
   Stream<List<KidProfile>> watchKidsWithFlags(List<String> kidIds) {
+    print('DEBUG: watchKidsWithFlags called with kidIds: $kidIds');
     if (kidIds.isEmpty) return Stream.value(<KidProfile>[]);
     final streams = kidIds.map(_watchKidAndMessages).toList();
-    return Rx.combineLatestList<KidProfile>(streams);
+    return Rx.combineLatestList<KidProfile>(streams).handleError((error) {
+      print('DEBUG: Error in watchKidsWithFlags: $error');
+      // Return empty list on error to prevent infinite loading
+      return <KidProfile>[];
+    });
   }
 }

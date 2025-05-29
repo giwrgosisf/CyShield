@@ -9,6 +9,7 @@ class ReportsRepository {
 
   /// Streams profiles with their flaggedMessages already loaded
   Stream<List<KidProfile>> watchFlaggedReports(List<String> kidIds) {
+    print('DEBUG: ReportsRepository.watchFlaggedReports called with kidIds: $kidIds');
     return _kidRepo.watchKidsWithFlags(kidIds);
   }
 }
