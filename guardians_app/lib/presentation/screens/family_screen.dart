@@ -53,37 +53,54 @@ class FamilyScreen extends StatelessWidget {
                   Center(
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                        vertical: 8,
-                        horizontal: 24,
+                        vertical: 12,
+                        horizontal: 32,
                       ),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(12),
                         boxShadow: const [
-                          BoxShadow(color: Colors.black26, blurRadius: 2),
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 8,
+                            offset: Offset(0, 2),
+                          ),
                         ],
                       ),
                       child: const Text(
                         'Οικογένεια',
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 32),
                   if (kids.isEmpty) ...[
                     Center(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 24,
-                          vertical: 24,
+                          vertical: 48,
                         ),
-                        child: Text(
-                          'Δεν έχουν προστεθεί παιδιά ακόμα.',
-                          style: const TextStyle(fontSize: 18),
-                          textAlign: TextAlign.center,
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.family_restroom,
+                              size: 64,
+                              color: Colors.grey[400],
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Δεν έχουν προστεθεί παιδιά ακόμα.',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey[700],
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -97,6 +114,7 @@ class FamilyScreen extends StatelessWidget {
                             crossAxisCount: 2,
                             crossAxisSpacing: 16,
                             mainAxisSpacing: 16,
+                            childAspectRatio: 0.85,
                           ),
                       itemBuilder: (context, index) {
                         final kid = kids[index];
@@ -119,10 +137,19 @@ class FamilyScreen extends StatelessWidget {
                           () => Navigator.pushNamed(context, '/add_child_info'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.primary,
+                        foregroundColor: Colors.white,
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                       child: const Text(
                         'Πρόσθεσε παιδί',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),

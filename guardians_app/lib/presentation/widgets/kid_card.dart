@@ -15,9 +15,13 @@ class KidCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Stack(
       children: [
         CircleAvatar(
           radius: 60,
+          backgroundColor: Colors.grey[200],
           backgroundImage:
               kid.photoURL != null
                   ? NetworkImage(kid.photoURL!)
@@ -25,31 +29,37 @@ class KidCard extends StatelessWidget {
                       as ImageProvider,
         ),
         Positioned(
-          right: -4,
-          top: -4,
+          right: 0,
+          top: 0,
           child: GestureDetector(
             onTap: onRemove,
             child: Container(
-              width: 48.0,
-              height: 48.0,
-              decoration: BoxDecoration(color: Colors.redAccent),
-              child: Center(
-                child: Icon(Icons.remove, color: Colors.white, size: 24.0),
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(color: Colors.redAccent, shape: BoxShape.circle),
+                child: const Icon(Icons.remove, color: Colors.white, size: 20),
               ),
             ),
           ),
+      ]
         ),
 
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         Container(
-          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           decoration: BoxDecoration(
             color: primaryColor,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(20),
           ),
           child: Text(
             kid.firstName,
-            style: const TextStyle(color: Colors.white, fontSize: 16),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],
