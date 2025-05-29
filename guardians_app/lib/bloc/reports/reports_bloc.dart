@@ -41,18 +41,17 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
                 print('DEBUG: Stream - Kid ${kid.firstName} has ${kid.flaggedMessages.length} flagged messages');
               }
 
-              if (isClosed) {
-                print('DEBUG: Bloc is closed, skipping emit');
-                return;
+              if (!emit.isDone && !isClosed) {
+                print('DEBUG: Emitting ReportsLoaded with ${kidsWithFlags.length} kids');
+                emit(ReportsLoaded(kidsWithFlags: kidsWithFlags));
+                print('DEBUG: Successfully emitted ReportsLoaded');
+              } else {
+                print('DEBUG: Emitter is done or bloc is closed, skipping emit');
               }
-
-              print('DEBUG: Emitting ReportsLoaded with ${kidsWithFlags.length} kids');
-              emit(ReportsLoaded(kidsWithFlags: kidsWithFlags));
-              print('DEBUG: Successfully emitted ReportsLoaded');
             },
             onError: (error) {
               print('DEBUG: Stream error: $error');
-              if (!isClosed) {
+              if (!emit.isDone && !isClosed) {
                 emit(ReportsError('Failed to load reports: $error'));
               }
             },
@@ -60,7 +59,7 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
       print('DEBUG: Stream subscription established');
     } catch (e) {
       print('DEBUG: Exception in _onLoadReports: $e');
-      if (!isClosed) {
+      if (!emit.isDone && !isClosed) {
         emit(ReportsError('Failed to load reports: $e'));
       }
     }
@@ -89,7 +88,7 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
 
       await Future.delayed(const Duration(milliseconds: 250));
 
-      if (!isClosed  &&  state is ReportsLoaded) {
+      if (!emit.isDone && !isClosed && state is ReportsLoaded) {
         final newState = state as ReportsLoaded;
         emit(newState.copyWith(isRefreshing: false));
       }
