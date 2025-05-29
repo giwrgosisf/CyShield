@@ -27,18 +27,20 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
           .watchFlaggedReports(event.kidIds)
           .listen(
             (kidsWithFlags) {
-              if (!isClosed) {
+              if (!isClosed && !emit.isDone) {
                 emit(ReportsLoaded(kidsWithFlags: kidsWithFlags));
               }
             },
             onError: (error) {
-              if (!isClosed) {
+              if (!isClosed && !emit.isDone) {
                 emit(ReportsError('Failed to load reports: $error'));
               }
             },
           );
     } catch (e) {
-      emit(ReportsError('Failed to load reports: $e'));
+      if (!emit.isDone) {
+        emit(ReportsError('Failed to load reports: $e'));
+      }
     }
   }
 
@@ -64,7 +66,7 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportsState> {
 
       await Future.delayed(const Duration(milliseconds: 250));
 
-      if (state is ReportsLoaded) {
+      if (!emit.isDone &&  state is ReportsLoaded) {
         final newState = state as ReportsLoaded;
         emit(newState.copyWith(isRefreshing: false));
       }
