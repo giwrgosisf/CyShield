@@ -6,7 +6,8 @@ class KidCard extends StatelessWidget {
   final Color primaryColor;
   final VoidCallback onRemove;
 
-  const KidCard({super.key,
+  const KidCard({
+    super.key,
     required this.kid,
     required this.primaryColor,
     required this.onRemove,
@@ -18,49 +19,77 @@ class KidCard extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Stack(
-      children: [
-        CircleAvatar(
-          radius: 60,
-          backgroundColor: Colors.grey[200],
-          backgroundImage:
-              kid.photoURL != null
-                  ? NetworkImage(kid.photoURL!)
-                  : const AssetImage('assets/images/austin.png')
-                      as ImageProvider,
-        ),
-        Positioned(
-          right: 0,
-          top: 0,
-          child: GestureDetector(
-            onTap: onRemove,
-            child: Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(color: Colors.redAccent, shape: BoxShape.circle),
-                child: const Icon(Icons.remove, color: Colors.white, size: 20),
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                color: Colors.lightBlue[100],
+                shape: BoxShape.circle,
               ),
             ),
-          ),
-      ]
-        ),
-
-        const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-          decoration: BoxDecoration(
-            color: primaryColor,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Text(
-            kid.firstName,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
+            Positioned(
+              left: 10,
+              top: 10,
+              child: CircleAvatar(
+                radius: 50,
+                backgroundColor: Colors.grey[200],
+                backgroundImage:
+                    kid.photoURL != null
+                        ? NetworkImage(kid.photoURL!)
+                        : const AssetImage('assets/images/austin.png')
+                            as ImageProvider,
               ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
+            ),
+            Positioned(
+              right: -8,
+              top: -8,
+              child: GestureDetector(
+                onTap: onRemove,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: Colors.redAccent,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.remove,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: -15,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 24,
+                  ),
+                  decoration: BoxDecoration(
+                    color: primaryColor,
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: Text(
+                    kid.firstName,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );
