@@ -170,7 +170,7 @@ CyShield features two main frontend applications, each serving a distinct user g
 
 ## Example Workflow
 
-To better understand how CyShield operates in practice, you can watch an [example workflow video here](https://vimeo.com/1090210748/40bcac9a28?share=copy).
+To better understand how CyShield operates in practice, you can watch an **[example workflow video here]**(https://vimeo.com/1090210748/40bcac9a28?share=copy).
 
 **Scenario Overview:**  
 1. **Child App Setup:**  
