@@ -177,7 +177,7 @@ To better understand how CyShield operates in practice, you can watch an [exampl
    The child installs the Kids App, pairs with a guardian and links their telegram account to the CyShield backend.
 
 2. **Guardian App Setup:**  
-   The parent or guardian installs the Guardians App and connects to their account and motitors txic activity.
+   The parent or guardian installs the Guardians App and connects to their account and motitors toxic activity.
 
 3. **Message Flow:**  
    - The child receives three messages from telegram: two containing cyberbullying content and one normal message.
