@@ -185,3 +185,12 @@ The Signal CLI and Telethon libraries used for messaging integration are not off
   - [Signal CLI GitHub Repository](https://github.com/AsamK/signal-cli)
   - [Telethon GitHub Repository](https://github.com/LonamiWebs/Telethon)
 
+## Contributors
+
+- **Christos Stamoulos**  
+  [GitHub Profile](https://github.com/ChristosStamoulos)  
+  
+
+- **Dejvid Isufaj**  
+  [GitHub Profile](https://github.com/giwrgosisf)  
+  
