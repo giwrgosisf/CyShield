@@ -156,7 +156,7 @@ CyShield features two main frontend applications, each serving a distinct user g
  - **Firestore Database:** For retrieving essential user and notification data  
   - **Firebase Cloud Messaging (FCM):** For real-time notifications
 
-### 2. Kid App
+### 2. Kids App
  - **Purpose:**  
   Installed on the child's device, this app connects the child's messaging applications with the backend, enabling real-time monitoring of messages. It facilitates the backend's ability to listen for and analyze messages as they are sent or received, ensuring timely detection of potential cyberbullying incidents.
 - **Structure:**  
@@ -167,6 +167,26 @@ CyShield features two main frontend applications, each serving a distinct user g
   - **Firebase Authentication:** For secure login  
   - **Background Services Connection:** For credentials collection and linking messaging accounts to the backend  
   - **Secure Communication:** Ensures all data sent to the backend is encrypted and privacy-respecting
+
+## Example Workflow
+
+**To better understand how CyShield operates in practice, you can watch an [example workflow video here](https://vimeo.com/1090210748/40bcac9a28?share=copy)**.
+
+**Scenario Overview:**  
+1. **Child App Setup:**  
+   The child installs the Kids App, pairs with a guardian and links their telegram account to the CyShield backend.
+
+2. **Guardian App Setup:**  
+   The parent or guardian installs the Guardians App and connects to their account and motitors toxic activity.
+
+3. **Message Flow:**  
+   - The child receives three messages from telegram: two containing cyberbullying content and one normal message.
+   - The backend detects in real-time the two cyberbullying messages.
+   - The parent receives real-time alerts for the toxic messages via the Guardians App, while the normal message is not flagged.
+
+
+
+
 
 ---
 
@@ -185,3 +205,12 @@ The Signal CLI and Telethon libraries used for messaging integration are not off
   - [Signal CLI GitHub Repository](https://github.com/AsamK/signal-cli)
   - [Telethon GitHub Repository](https://github.com/LonamiWebs/Telethon)
 
+## Contributors
+
+- **Christos Stamoulos**  
+  [GitHub Profile](https://github.com/ChristosStamoulos)  
+  
+
+- **Dejvid Isufaj**  
+  [GitHub Profile](https://github.com/giwrgosisf)  
+  
