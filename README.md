@@ -110,7 +110,7 @@ CyShield is a  real time cyberbullying detection platform designed to empower pa
 
 1. **Clone the repository:**
    ```sh
-   git clone https://github.com/your-org/CyShield.git
+   git clone https://github.com/giwrgosisf/CyShield.git
    cd CyShield/backend
    ```
 
