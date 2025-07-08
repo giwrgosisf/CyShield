@@ -199,7 +199,7 @@ CyShield features two main frontend applications, each serving a distinct user g
 
 - Ensure your Firebase service account key is placed in the correct location as referenced in `CyShield-central`.
 - For development, you may run individual services using `npm start` or `python ...` as appropriate.
-- The ML service requires a GPU for optimal performance.
+- The ML service requires a GPU for optimal performance. Using a CPU is not recommended, as it has not been tested yet.
 - **Notice:**  
 The Signal CLI and Telethon libraries used for messaging integration are not official APIs; they are used for learning purposes only!
   - [Signal CLI GitHub Repository](https://github.com/AsamK/signal-cli)
